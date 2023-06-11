@@ -616,7 +616,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: DISTANT_LANDS;COZY_WEATHER
+    Standalone: DISTANT_LANDS;COZY_WEATHER;THIRD_PERSON_CONTROLLER;TEXTMESH_PRO_PRESENT
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
