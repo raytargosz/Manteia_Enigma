@@ -116,7 +116,7 @@ Material:
     - _CirrostratusMultiplier: 0
     - _CirrusMoveSpeed: 0.5
     - _CirrusMultiplier: 0
-    - _ClippingThreshold: 0.791
+    - _ClippingThreshold: 0.5
     - _CloudCohesion: 0.85
     - _CloudCohesion1: 0.6741176
     - _CloudCover: 1
@@ -133,9 +133,9 @@ Material:
     - _CumulusCoverageMultiplier: 0.2109
     - _CumulusCoverageMultiplier1: 1
     - _Cutoff: 0.5
-    - _DetailAmount: 18.58
+    - _DetailAmount: 25
     - _DetailNormalMapScale: 1
-    - _DetailScale: 1.26
+    - _DetailScale: 2.61
     - _DstBlend: 0
     - _Flatness: 20
     - _Flatness1: 1.9
