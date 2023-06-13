@@ -7,6 +7,10 @@ public class GridManager : MonoBehaviour
     [Header("Grid Settings")]
     [Tooltip("Size of each grid unit.")]
     [SerializeField] private Vector3 gridSize = Vector3.one;
+    [Tooltip("Position of the grid.")]
+    [SerializeField] private Vector3 gridPosition = Vector3.zero;
+    [Tooltip("Alpha of the viewable Gizmo.")]
+    [SerializeField] [Range(0f, 1f)] private float gizmoAlpha = 1f;
 
     // Dictionary to keep track of objects in the grid
     private Dictionary<Vector3, GameObject> grid = new Dictionary<Vector3, GameObject>();
@@ -53,7 +57,7 @@ public class GridManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.white;
+        Gizmos.color = new Color(1f, 1f, 1f, gizmoAlpha);
 
         for (float x = 0; x <= gridSize.x; x += 1)
         {
@@ -61,7 +65,7 @@ public class GridManager : MonoBehaviour
             {
                 for (float z = 0; z <= gridSize.z; z += 1)
                 {
-                    var point = new Vector3(x, y, z);
+                    var point = new Vector3(x, y, z) + gridPosition;
                     Gizmos.DrawWireCube(point, Vector3.one);
                 }
             }
