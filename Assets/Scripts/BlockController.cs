@@ -10,7 +10,9 @@ public class BlockController : MonoBehaviour
     [Tooltip("Distance from player to spawn the block.")]
     public float spawnDistance = 1f;
 
-    // Update is called once per frame
+    [Tooltip("Reference to the GridManager that manages the grid for block placement.")]
+    public GridManager gridManager; // Assign in inspector
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E)) // Change this input as needed
@@ -23,7 +25,8 @@ public class BlockController : MonoBehaviour
                 BreakableBlock block = hit.collider.GetComponent<BreakableBlock>();
                 if (block)
                 {
-                    // Destroy the block
+                    // Remove the block from the grid before destroying it
+                    gridManager.RemoveObject(block.transform.position);
                     block.Interact();
                     return;
                 }
@@ -42,8 +45,9 @@ public class BlockController : MonoBehaviour
                 spawnPosition = transform.position + transform.forward;
             }
 
-            // Create the new block
-            Instantiate(breakableBlockPrefab, spawnPosition, Quaternion.identity);
+            // Create the new block and add it to the grid
+            GameObject newBlock = Instantiate(breakableBlockPrefab, spawnPosition, Quaternion.identity);
+            gridManager.PlaceObject(newBlock, spawnPosition);
         }
     }
 }
