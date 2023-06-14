@@ -87,35 +87,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Min and max pitch for running and jumping")]
     private Vector2 runJumpPitchRange = new Vector2(0.8f, 1.2f);
 
-    [Header("Player Stats")]
-    [SerializeField, Tooltip("Max stamina")]
-    private float maxStamina = 100f;
-    private float currentStamina;
-
-    [SerializeField, Tooltip("Max boost")]
-    private float maxBoost = 100f;
-    private float currentBoost;
-
-    [SerializeField, Tooltip("Stamina depletion rate when running")]
-    private float staminaDepletionRate = 10f;
-
-    [SerializeField, Tooltip("Boost depletion rate")]
-    private float boostDepletionRate = 33.3f; // Amount of boost depleted per second when boosting
-
-    [SerializeField, Tooltip("Stamina cost for jumping")]
-    private float staminaJumpCost = 20f; // Stamina cost for jumping
-
-    [SerializeField, Tooltip("Stamina regeneration rate")]
-    private float staminaRegenSpeed = 20f; // Stamina regenerated per second when not running
-
-    [SerializeField, Tooltip("Boost regeneration rate")]
-    private float boostRegenSpeed = 10f; // Boost regenerated per second when not boosting
-
-    [SerializeField, Tooltip("Max health")]
-    private float maxHealth = 100f;
-    private float currentHealth;
-
-
     [SerializeField, Tooltip("Map of boost sounds to keys")]
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
 
@@ -153,30 +124,10 @@ public class PlayerController : MonoBehaviour
     private float xRotation = 0f;
     private float footstepCounter = 0f;
 
-    // Public getters for current health, stamina, and boost
-    public float CurrentHealth
-    {
-        get { return currentHealth; }
-    }
-
-    public float CurrentStamina
-    {
-        get { return currentStamina; }
-    }
-
-    public float CurrentBoost
-    {
-        get { return currentBoost; }
-    }
-
     void Start()
     {
         InitializePlayer();
         InitializeSoundAndForces();
-
-        currentHealth = maxHealth;
-        currentStamina = maxStamina;
-        currentBoost = maxBoost;
     }
 
     private void InitializePlayer()
@@ -226,33 +177,6 @@ public class PlayerController : MonoBehaviour
         ProcessFootsteps();
 
         HandleBobbing();
-
-        // Handle stamina and boost
-        if (isRunning && controller.velocity.magnitude > 0.1f)
-        {
-            // Deplete stamina when running
-            currentStamina -= staminaDepletionRate * Time.deltaTime;
-            currentStamina = Mathf.Max(0f, currentStamina);
-        }
-        else
-        {
-            // Regenerate stamina when not running
-            currentStamina += staminaRegenSpeed * Time.deltaTime;
-            currentStamina = Mathf.Min(maxStamina, currentStamina);
-        }
-
-        if (isBoosting)
-        {
-            // Deplete boost when boosting
-            currentBoost -= boostDepletionRate * Time.deltaTime;
-            currentBoost = Mathf.Max(0f, currentBoost);
-        }
-        else
-        {
-            // Regenerate boost when not boosting
-            currentBoost += boostRegenSpeed * Time.deltaTime;
-            currentBoost = Mathf.Min(maxBoost, currentBoost);
-        }
     }
 
     private void ProcessGroundState()
