@@ -140,7 +140,8 @@ public class PlayerController : MonoBehaviour
     private float originalGravity;
     private Dictionary<KeyCode, float> boostForces;
 
-    private bool canJump;
+    private bool canRun = true; 
+    private bool canJump = true;
     private bool isGrounded;
     private bool isRunning = false;
     private bool canBoost = false;
@@ -249,19 +250,39 @@ public class PlayerController : MonoBehaviour
 
         HandleBobbing();
 
-        // Handle stamina and boost
-        if (currentState == PlayerState.Running && isGrounded) // Ensure player is on the ground before draining stamina when running
+        // Handle stamina
+        if (currentState == PlayerState.Running && isGrounded && currentStamina > 0) // Ensure player is on the ground before draining stamina when running
         {
             currentStamina -= staminaDepletionRate * Time.deltaTime;
         }
-        else if (currentState == PlayerState.Boosting && currentBoost == maxBoost)
+        else
+        {
+            if (currentStamina < maxStamina)
+            {
+                currentStamina += staminaRegenSpeed * Time.deltaTime;
+            }
+        }
+
+        // If stamina hits zero, player can't run or jump until stamina is full
+        if (currentStamina <= 0)
+        {
+            canRun = false;
+            canJump = false;
+        }
+        else if (currentStamina >= maxStamina)
+        {
+            canRun = true;
+            canJump = true;
+        }
+
+        // Handle boost
+        if (currentState == PlayerState.Boosting && currentBoost >= 0)
         {
             currentBoost -= boostDepletionRate * Time.deltaTime;
         }
-        else
+        else if (isGrounded) // boost regenerates only when player is on the ground
         {
-            currentStamina += staminaRegenSpeed * Time.deltaTime;
-            if (isGrounded) currentBoost += boostRegenSpeed * Time.deltaTime;
+            currentBoost += boostRegenSpeed * Time.deltaTime;
         }
 
         // Check if boost is fully regenerated before allowing it to be used
@@ -281,6 +302,30 @@ public class PlayerController : MonoBehaviour
         // Set the alpha values for the handle images
         staminaHandleImage.color = new Color(staminaHandleImage.color.r, staminaHandleImage.color.g, staminaHandleImage.color.b, staminaBar.size > 0 ? 1 : 0);
         boostHandleImage.color = new Color(boostHandleImage.color.r, boostHandleImage.color.g, boostHandleImage.color.b, boostBar.size > 0 ? 1 : 0);
+
+        // Adjust Stamina bar
+        staminaBar.size = currentStamina / maxStamina;
+        float staminaAlpha = staminaBar.size > 0 ? 1f : 0f;
+        staminaHandleImage.color = new Color(staminaHandleImage.color.r, staminaHandleImage.color.g, staminaHandleImage.color.b, staminaAlpha);
+
+        // Adjust Boost bar
+        float boostAlpha = currentBoost > 0 ? 1f : 0f;
+        boostHandleImage.color = new Color(boostHandleImage.color.r, boostHandleImage.color.g, boostHandleImage.color.b, boostAlpha);
+
+        // If boost is regenerating, make the boost bar fill gradually
+        if (currentBoost < maxBoost && isGrounded)
+        {
+            boostBar.size = Mathf.Lerp(boostBar.size, currentBoost / maxBoost, boostRegenSpeed * Time.deltaTime);
+        }
+        else
+        {
+            boostBar.size = currentBoost / maxBoost;
+        }
+
+        // Health bar logic remains the same
+        healthBar.size = currentHealth / maxHealth;
+        float healthAlpha = healthBar.size > 0 ? 1f : 0f;
+        healthHandleImage.color = new Color(healthHandleImage.color.r, healthHandleImage.color.g, healthHandleImage.color.b, healthAlpha);
     }
 
     private void ProcessGroundState()
@@ -301,43 +346,63 @@ public class PlayerController : MonoBehaviour
     }
     private void ProcessPlayerMovement()
     {
-        // Initialize a variable to hold the moveSpeed
         float moveSpeed;
 
-        // Check the current state
-        switch (currentState)
+        // Only allow running if stamina is not exhausted and canRun is true
+        if ((currentStamina > 0 || !Input.GetKey(KeyCode.LeftShift)) && canRun)
         {
-            case PlayerState.Idle:
-            case PlayerState.Walking:
-                moveSpeed = walkSpeed;
-                break;
-            case PlayerState.Running:
-                // Only run if there's enough stamina
-                moveSpeed = (currentStamina > 0) ? runSpeed : walkSpeed;
-                break;
-            default:
-                moveSpeed = walkSpeed;
-                break;
+            moveSpeed = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? runSpeed : walkSpeed;
+            currentState = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? PlayerState.Running : PlayerState.Walking;
+        }
+        else
+        {
+            moveSpeed = walkSpeed;
+            currentState = PlayerState.Walking;
         }
 
-        // Apply movement based on the moveSpeed
+        // Change the state to Idle if there's no movement
+        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
+
+        // If player is grounded and can jump, set the currentState to Boosting if running
+        if (Input.GetButtonDown("Jump") && canJump && isGrounded)
+        {
+            if (currentState == PlayerState.Running)
+            {
+                currentState = PlayerState.Boosting;
+                canBoost = true; // set canBoost to true as player is going to jump and then boost
+            }
+        }
+
+        isRunning = Input.GetKey(KeyCode.LeftShift) && canRun ? true : false;
+
         Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
         controller.Move(move * moveSpeed * Time.deltaTime);
 
-        // If player is moving, update the boost direction
+        // Store the move direction for use in boosting
         if (move != Vector3.zero)
         {
             boostDirection = move.normalized;
         }
 
-        // Update the player's current state
-        currentState = (Input.GetKey(KeyCode.LeftShift) && currentStamina > 0 && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)) ? PlayerState.Running : PlayerState.Walking;
-
-        // If there's no movement, set the state to Idle
-        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
-
-        // If the player is jumping, set the state to Boosting
-        if (Input.GetButtonDown("Jump") && canBoost && !isGrounded) currentState = PlayerState.Boosting;
+        // Lean effect
+        if (isRunning || isBoosting) // Apply lean only when running or boosting
+        {
+            float targetLeanAngle = 0f;
+            if (move != Vector3.zero)  // If player is moving
+            {
+                if (Input.GetAxis("Horizontal") > 0)  // Moving right
+                {
+                    targetLeanAngle = -maxLeanAngle;
+                }
+                else if (Input.GetAxis("Horizontal") < 0)  // Moving left
+                {
+                    targetLeanAngle = maxLeanAngle;
+                }
+            }
+            float currentLeanAngle = playerCamera.transform.localEulerAngles.z;
+            float newLeanAngle = Mathf.LerpAngle(currentLeanAngle, targetLeanAngle, leanSpeed * Time.deltaTime);
+            playerCamera.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, playerCamera.transform.localEulerAngles.y, newLeanAngle);
+        }
     }
 
     private void ProcessPlayerFOV()
@@ -370,7 +435,6 @@ public class PlayerController : MonoBehaviour
         // Debug statement:
         Debug.Log("ProcessMouseLook called. Mouse X: " + mouseLookX + ", Mouse Y: " + mouseLookY);
     }
-
     private void ProcessJumpInput()
     {
         KeyCode boostKey = KeyCode.None;
@@ -386,24 +450,29 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Jump"))
         {
-            if (isGrounded)
+            if (isGrounded && canJump) // Check if the player has enough stamina to jump and is on the ground
             {
-                if (canJump) // Check if the player has enough stamina to jump
-                {
-                    velocity.y += Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
-                    canBoost = true;
-                    hasJumped = true;
-                    actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-                    actionSource.PlayOneShot(jumpSound);
+                velocity.y += Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
+                canBoost = true;
+                hasJumped = true;
+                actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
+                actionSource.PlayOneShot(jumpSound);
 
-                    // Decrease stamina for the jump
-                    currentStamina -= staminaJumpCost;
-                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+                // Decrease stamina for the jump
+                currentStamina -= staminaJumpCost;
+                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+                // If stamina is zero, disallow running
+                if (currentStamina <= 0)
+                {
+                    canRun = false;
                 }
             }
-            else if (canBoost && !isGrounded && boostKey != KeyCode.None)
+            else if (canBoost && !isGrounded && hasJumped && boostKey != KeyCode.None)
             {
+                // the player can boost only after they've jumped, but not if they've just fallen from a platform
                 canBoost = false;
+                hasJumped = false; // set this back to false once boost is done
 
                 BoostSound boostSound = boostSounds[boostKey];
                 actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
