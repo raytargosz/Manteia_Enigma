@@ -7,7 +7,7 @@ public class PlayerUI : MonoBehaviour
     private PlayerController player;  // Assign your player object in the inspector
 
     [SerializeField]
-    private Slider healthSlider, staminaSlider, boostSlider;
+    private Scrollbar healthSlider, staminaSlider, boostSlider;
 
     private void Update()
     {
