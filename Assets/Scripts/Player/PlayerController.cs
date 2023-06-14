@@ -116,21 +116,11 @@ public class PlayerController : MonoBehaviour
     private float maxHealth = 100f;
     private float currentHealth;
 
-    [SerializeField]
-    private Scrollbar healthBar;
-    [SerializeField]
-    private Scrollbar staminaBar;
-    [SerializeField]
-    private Scrollbar boostBar;
-    [SerializeField]
-    private Image healthHandleImage;
-    [SerializeField]
-    private Image staminaHandleImage;
-    [SerializeField]
-    private Image boostHandleImage;
-
     [SerializeField, Tooltip("Map of boost sounds to keys")]
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
+
+    [SerializeField]
+    private PlayerUIController playerUIController;
 
     // Non-Serialized Fields
     private CharacterController controller;
@@ -140,7 +130,7 @@ public class PlayerController : MonoBehaviour
     private float originalGravity;
     private Dictionary<KeyCode, float> boostForces;
 
-    private bool canRun = true; 
+    private bool canRun = true;
     private bool canJump = true;
     private bool isGrounded;
     private bool isRunning = false;
@@ -193,14 +183,6 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currentBoost = maxBoost;
-
-        healthBar.size = currentHealth / maxHealth;
-        staminaBar.size = currentStamina / maxStamina;
-        boostBar.size = currentBoost / maxBoost;
-
-        healthBar.value = currentHealth;
-        staminaBar.value = currentStamina;
-        boostBar.value = currentBoost;
     }
 
     private void InitializePlayer()
@@ -263,6 +245,8 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        playerUIController.UpdateStaminaBar(currentStamina, maxStamina);
+
         // If stamina hits zero, player can't run or jump until stamina is full
         if (currentStamina <= 0)
         {
@@ -296,36 +280,34 @@ public class PlayerController : MonoBehaviour
         currentBoost = Mathf.Clamp(currentBoost, 0, maxBoost);
 
         // Update UI
-        staminaBar.size = currentStamina / maxStamina;
-        boostBar.size = currentBoost / maxBoost;
-
-        // Set the alpha values for the handle images
-        staminaHandleImage.color = new Color(staminaHandleImage.color.r, staminaHandleImage.color.g, staminaHandleImage.color.b, staminaBar.size > 0 ? 1 : 0);
-        boostHandleImage.color = new Color(boostHandleImage.color.r, boostHandleImage.color.g, boostHandleImage.color.b, boostBar.size > 0 ? 1 : 0);
+        playerUIController.UpdateBoostBar(currentBoost, maxBoost);
 
         // Adjust Stamina bar
-        staminaBar.size = currentStamina / maxStamina;
-        float staminaAlpha = staminaBar.size > 0 ? 1f : 0f;
-        staminaHandleImage.color = new Color(staminaHandleImage.color.r, staminaHandleImage.color.g, staminaHandleImage.color.b, staminaAlpha);
+        float staminaAlpha = currentStamina > 0 ? 1f : 0f;
+        playerUIController.SetStaminaHandleAlpha(staminaAlpha);
 
         // Adjust Boost bar
         float boostAlpha = currentBoost > 0 ? 1f : 0f;
-        boostHandleImage.color = new Color(boostHandleImage.color.r, boostHandleImage.color.g, boostHandleImage.color.b, boostAlpha);
+        playerUIController.SetBoostHandleAlpha(boostAlpha);
 
         // If boost is regenerating, make the boost bar fill gradually
         if (currentBoost < maxBoost && isGrounded)
         {
-            boostBar.size = Mathf.Lerp(boostBar.size, currentBoost / maxBoost, boostRegenSpeed * Time.deltaTime);
+            // You will need to add a method in PlayerUIController to handle this
+            playerUIController.LerpBoostBarSize(currentBoost / maxBoost, boostRegenSpeed * Time.deltaTime);
         }
         else
         {
-            boostBar.size = currentBoost / maxBoost;
+            // The boost bar size is already updated at the top of the function
         }
 
-        // Health bar logic remains the same
-        healthBar.size = currentHealth / maxHealth;
-        float healthAlpha = healthBar.size > 0 ? 1f : 0f;
-        healthHandleImage.color = new Color(healthHandleImage.color.r, healthHandleImage.color.g, healthHandleImage.color.b, healthAlpha);
+        // Handle Health
+        float healthRatio = currentHealth / maxHealth;
+        playerUIController.UpdateHealthBar(currentHealth, maxHealth);
+
+        // Handle health alpha
+        float healthAlpha = healthRatio > 0 ? 1f : 0f;
+        playerUIController.SetHealthHandleAlpha(healthAlpha);
     }
 
     private void ProcessGroundState()
@@ -348,7 +330,7 @@ public class PlayerController : MonoBehaviour
     {
         float moveSpeed;
 
-        // Only allow running if stamina is not exhausted and canRun is true
+        // Only allow running if stamina is not exhausted
         if ((currentStamina > 0 || !Input.GetKey(KeyCode.LeftShift)) && canRun)
         {
             moveSpeed = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? runSpeed : walkSpeed;
@@ -363,17 +345,16 @@ public class PlayerController : MonoBehaviour
         // Change the state to Idle if there's no movement
         if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
 
-        // If player is grounded and can jump, set the currentState to Boosting if running
-        if (Input.GetButtonDown("Jump") && canJump && isGrounded)
+        // Add a section to handle FOV in ProcessJumpInput
+        if (Input.GetButtonDown("Jump") && canJump)
         {
-            if (currentState == PlayerState.Running)
+            if (isGrounded)
             {
-                currentState = PlayerState.Boosting;
-                canBoost = true; // set canBoost to true as player is going to jump and then boost
+                if (currentState == PlayerState.Running) currentState = PlayerState.Boosting;
             }
         }
 
-        isRunning = Input.GetKey(KeyCode.LeftShift) && canRun ? true : false;
+        isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
 
         Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
         controller.Move(move * moveSpeed * Time.deltaTime);
@@ -404,7 +385,6 @@ public class PlayerController : MonoBehaviour
             playerCamera.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, playerCamera.transform.localEulerAngles.y, newLeanAngle);
         }
     }
-
     private void ProcessPlayerFOV()
     {
         float targetFOV = defaultFOV;
@@ -450,29 +430,30 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Jump"))
         {
-            if (isGrounded && canJump) // Check if the player has enough stamina to jump and is on the ground
+            if (isGrounded)
             {
-                velocity.y += Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
-                canBoost = true;
-                hasJumped = true;
-                actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-                actionSource.PlayOneShot(jumpSound);
-
-                // Decrease stamina for the jump
-                currentStamina -= staminaJumpCost;
-                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-
-                // If stamina is zero, disallow running
-                if (currentStamina <= 0)
+                if (canJump) // Check if the player has enough stamina to jump
                 {
-                    canRun = false;
+                    velocity.y += Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
+                    canBoost = true;
+                    hasJumped = true;
+                    actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
+                    actionSource.PlayOneShot(jumpSound);
+
+                    // Decrease stamina for the jump
+                    currentStamina -= staminaJumpCost;
+                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+                    // If stamina is zero, disallow running
+                    if (currentStamina <= 0)
+                    {
+                        canRun = false;
+                    }
                 }
             }
-            else if (canBoost && !isGrounded && hasJumped && boostKey != KeyCode.None)
+            else if (canBoost && !isGrounded && boostKey != KeyCode.None)
             {
-                // the player can boost only after they've jumped, but not if they've just fallen from a platform
                 canBoost = false;
-                hasJumped = false; // set this back to false once boost is done
 
                 BoostSound boostSound = boostSounds[boostKey];
                 actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
