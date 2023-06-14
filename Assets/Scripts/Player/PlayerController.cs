@@ -12,8 +12,6 @@ public class PlayerController : MonoBehaviour
     private float runSpeed = 6f;
     [SerializeField, Tooltip("Jump force for the regular jump")]
     private float jumpForce = 2f;
-
-    [Header("Boost Forces")]
     [SerializeField, Tooltip("Boost force for 'W' key")]
     private float boostForceW = 65f;
     [SerializeField, Tooltip("Boost force for 'A' key")]
@@ -22,6 +20,26 @@ public class PlayerController : MonoBehaviour
     private float boostForceS = 45f;
     [SerializeField, Tooltip("Boost force for 'D' key")]
     private float boostForceD = 55f;
+
+    [Header("Camera Bobbing")]
+    [SerializeField, Tooltip("Bobbing speed when idle")]
+    private float idleBobbingSpeed = 0.5f;
+    [SerializeField, Tooltip("Bobbing speed when walking")]
+    private float walkBobbingSpeed = 0.8f;
+    [SerializeField, Tooltip("Bobbing speed when running")]
+    private float runBobbingSpeed = 1.2f;
+    [SerializeField, Tooltip("Bobbing speed when boosting")]
+    private float boostBobbingSpeed = 1.5f;
+    [SerializeField, Tooltip("Bobbing amount")]
+    private float bobbingAmount = 0.05f;
+
+    [Header("Gravity Control")]
+    [SerializeField, Tooltip("Gravity multiplier after boosting")]
+    private float boostedGravityMultiplier = 2f;
+
+    [Header("Mouse Look")]
+    [SerializeField, Tooltip("Mouse sensitivity")]
+    private float mouseSensitivity = 100f;
 
     [Header("Field of View")]
     [SerializeField, Tooltip("Default Field of View")]
@@ -33,9 +51,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Transition speed between FOVs")]
     private float fovTransitionSpeed = 5f;
 
-    [Header("Mouse Look")]
-    [SerializeField, Tooltip("Mouse sensitivity")]
-    private float mouseSensitivity = 100f;
+    [Header("Lean Effect")]
+    [SerializeField, Tooltip("Max lean angle in degrees")]
+    private float maxLeanAngle = 10f;
+    [SerializeField, Tooltip("Speed of transitioning to max lean")]
+    private float leanSpeed = 5f;
 
     [Header("Sounds")]
     [SerializeField, Tooltip("Right footstep sound")]
@@ -46,6 +66,14 @@ public class PlayerController : MonoBehaviour
     private AudioClip jumpSound;
     [SerializeField, Tooltip("Land sound")]
     private AudioClip landSound;
+    [SerializeField, Tooltip("Boost sound for 'W' key")]
+    private BoostSound boostSoundW;
+    [SerializeField, Tooltip("Boost sound for 'A' key")]
+    private BoostSound boostSoundA;
+    [SerializeField, Tooltip("Boost sound for 'S' key")]
+    private BoostSound boostSoundS;
+    [SerializeField, Tooltip("Boost sound for 'D' key")]
+    private BoostSound boostSoundD;
 
     [Header("Footstep Interval")]
     [SerializeField, Tooltip("Interval for footstep sounds when walking")]
@@ -61,26 +89,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField, Tooltip("Map of boost sounds to keys")]
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
-
-    [Header("Boost Sounds")]
-    [SerializeField, Tooltip("Boost sound for 'W' key")]
-    private BoostSound boostSoundW;
-    [SerializeField, Tooltip("Boost sound for 'A' key")]
-    private BoostSound boostSoundA;
-    [SerializeField, Tooltip("Boost sound for 'S' key")]
-    private BoostSound boostSoundS;
-    [SerializeField, Tooltip("Boost sound for 'D' key")]
-    private BoostSound boostSoundD;
-
-    [Header("Lean Effect")]
-    [SerializeField, Tooltip("Max lean angle in degrees")]
-    private float maxLeanAngle = 10f;
-    [SerializeField, Tooltip("Speed of transitioning to max lean")]
-    private float leanSpeed = 5f;
-
-    [Header("Gravity Control")]
-    [SerializeField, Tooltip("Gravity multiplier after boosting")]
-    private float boostedGravityMultiplier = 2f;
 
     // Non-Serialized Fields
     private CharacterController controller;
@@ -99,6 +107,18 @@ public class PlayerController : MonoBehaviour
     private bool isBoosting = false;
     private Vector3 boostDirection = Vector3.zero;
     private bool isFallingAfterBoost = false;
+    private float bobbingCounter = 0f;
+    private float defaultCameraYPos;
+
+    // Add a variable to track the current player state
+    private PlayerState currentState = PlayerState.Idle;
+    private enum PlayerState
+    {
+        Idle,
+        Walking,
+        Running,
+        Boosting
+    }
 
     private float yRotation = 0f;
     private float xRotation = 0f;
@@ -107,24 +127,44 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         InitializePlayer();
+        InitializeSoundAndForces();
+    }
+
+    private void InitializePlayer()
+    {
+        controller = GetComponent<CharacterController>();
+        playerCamera = GetComponentInChildren<Camera>();
+        footstepSource = GetComponents<AudioSource>()[0];
+        actionSource = GetComponents<AudioSource>()[1];
+        playerCamera.fieldOfView = defaultFOV;
+
+        Debug.Log($"Controller: {controller != null}");
+        Debug.Log($"PlayerCamera: {playerCamera != null}");
+        Debug.Log($"FootstepSource: {footstepSource != null}");
+        Debug.Log($"ActionSource: {actionSource != null}");
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void InitializeSoundAndForces()
+    {
         isGrounded = controller.isGrounded;
-        // Populate boostSounds
-        boostSounds[KeyCode.W] = boostSoundW;
-        boostSounds[KeyCode.A] = boostSoundA;
-        boostSounds[KeyCode.S] = boostSoundS;
-        boostSounds[KeyCode.D] = boostSoundD;
-
         originalGravity = Physics.gravity.y;
-
-        // Populate boostForces
+        boostSounds = new Dictionary<KeyCode, BoostSound>
+    {
+        {KeyCode.W, boostSoundW},
+        {KeyCode.A, boostSoundA},
+        {KeyCode.S, boostSoundS},
+        {KeyCode.D, boostSoundD}
+    };
         boostForces = new Dictionary<KeyCode, float>
-{
-    {KeyCode.W, boostForceW},
-    {KeyCode.A, boostForceA},
-    {KeyCode.S, boostForceS},
-    {KeyCode.D, boostForceD}
-};
-
+    {
+        {KeyCode.W, boostForceW},
+        {KeyCode.A, boostForceA},
+        {KeyCode.S, boostForceS},
+        {KeyCode.D, boostForceD}
+    };
     }
 
     void Update()
@@ -135,25 +175,8 @@ public class PlayerController : MonoBehaviour
         ProcessMouseLook();
         ProcessJumpInput();
         ProcessFootsteps();
-    }
 
-    private void InitializePlayer()
-    {
-        controller = GetComponent<CharacterController>();
-        playerCamera = GetComponentInChildren<Camera>();
-        AudioSource[] sources = GetComponents<AudioSource>();
-        footstepSource = sources[0];
-        actionSource = sources[1];
-        playerCamera.fieldOfView = defaultFOV;
-
-        Debug.Log("Controller: " + (controller != null));
-        Debug.Log("PlayerCamera: " + (playerCamera != null));
-        Debug.Log("FootstepSource: " + (footstepSource != null));
-        Debug.Log("ActionSource: " + (actionSource != null));
-
-        // Hide and lock cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        HandleBobbing();
     }
 
     private void ProcessGroundState()
@@ -175,7 +198,23 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessPlayerMovement()
     {
-        float moveSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+        float moveSpeed = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0 ? runSpeed : walkSpeed;
+
+        // Change the current state based on the movement and the shift key
+        currentState = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0 ? PlayerState.Running : PlayerState.Walking;
+
+        // Change the state to Idle if there's no movement
+        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
+
+        // Add a section to handle FOV in ProcessJumpInput
+        if (Input.GetButtonDown("Jump"))
+        {
+            if (isGrounded)
+            {
+                if (currentState == PlayerState.Running) currentState = PlayerState.Boosting;
+            }
+        }
+
         isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
 
         Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
@@ -210,8 +249,17 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessPlayerFOV()
     {
-        float targetFOV = isRunning ? runFOV : defaultFOV;
-        if (!isGrounded && canBoost) targetFOV = boostFOV;
+        float targetFOV = defaultFOV;
+
+        if (isBoosting)
+        {
+            targetFOV = boostFOV;
+        }
+        else if (isRunning && controller.velocity.magnitude > 0.1f)
+        {
+            targetFOV = runFOV;
+        }
+
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, fovTransitionSpeed * Time.deltaTime);
     }
 
@@ -287,7 +335,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator Boost(KeyCode key)
     {
         isBoosting = true;
-        float boostTimer = 0.33f;  // Adjust this value to control the duration of the boost
+        float boostTimer = 0.5f;  // Adjust this value to control the duration of the boost
 
         while (boostTimer > 0)
         {
@@ -323,6 +371,45 @@ public class PlayerController : MonoBehaviour
                 rightFootNext = !rightFootNext;
                 footstepCounter = isRunning ? runFootstepInterval : walkFootstepInterval;
             }
+        }
+    }
+    private void HandleBobbing()
+    {
+        float bobbingSpeed = 0f;
+
+        if (currentState == PlayerState.Idle || controller.velocity.magnitude > 0.1f) // Add a condition to check if player is moving for states other than idle
+        {
+            switch (currentState)
+            {
+                case PlayerState.Idle:
+                    bobbingSpeed = idleBobbingSpeed;
+                    break;
+                case PlayerState.Walking:
+                    bobbingSpeed = walkBobbingSpeed;
+                    break;
+                case PlayerState.Running:
+                    bobbingSpeed = runBobbingSpeed;
+                    break;
+                case PlayerState.Boosting:
+                    bobbingSpeed = boostBobbingSpeed;
+                    break;
+            }
+
+            bobbingCounter += Time.deltaTime * bobbingSpeed;
+            playerCamera.transform.localPosition = new Vector3(
+                playerCamera.transform.localPosition.x,
+                defaultCameraYPos + Mathf.Sin(bobbingCounter) * bobbingAmount,
+                playerCamera.transform.localPosition.z
+            );
+        }
+        else
+        {
+            // Stop bobbing when not moving
+            playerCamera.transform.localPosition = new Vector3(
+                playerCamera.transform.localPosition.x,
+                Mathf.Lerp(playerCamera.transform.localPosition.y, defaultCameraYPos, Time.deltaTime * bobbingSpeed),
+                playerCamera.transform.localPosition.z
+            );
         }
     }
 }
