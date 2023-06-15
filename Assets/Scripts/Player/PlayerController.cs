@@ -37,21 +37,33 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Gravity multiplier after boosting")]
     private float boostedGravityMultiplier = 2f;
 
+
     [Header("Camera Bobbing")]
+
     [SerializeField, Tooltip("Bobbing speed when idle")]
     private float idleBobbingSpeed = 0.5f;
+    [SerializeField]
+    private float idleBobbingAmount = 0.05f;
+
     [SerializeField, Tooltip("Bobbing speed when walking")]
     private float walkBobbingSpeed = 0.8f;
+    [SerializeField]
+    private float walkBobbingAmount = 0.1f;
+
     [SerializeField, Tooltip("Bobbing speed when running")]
     private float runBobbingSpeed = 1.2f;
+    [SerializeField]
+    private float runBobbingAmount = 0.15f;
+
     [SerializeField, Tooltip("Bobbing speed when boosting")]
     private float boostBobbingSpeed = 1.5f;
-    [SerializeField, Tooltip("Bobbing amount")]
-    private float bobbingAmount = 0.05f;
+    [SerializeField]
+    private float boostBobbingAmount = 0.2f;
 
     [Header("Mouse Look")]
     [SerializeField, Tooltip("Mouse sensitivity")]
     private float mouseSensitivity = 100f;
+
 
     [Header("Field of View")]
     [SerializeField, Tooltip("Default Field of View")]
@@ -158,13 +170,18 @@ public class PlayerController : MonoBehaviour
 
     // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
-    private enum PlayerState
+    public enum PlayerState
     {
         Idle,
         Walking,
         Running,
+        Jumping,
         Boosting,
-        Grounded
+    }
+
+    public PlayerState GetCurrentState()
+    {
+        return currentState;
     }
 
     private float yRotation = 0f;
@@ -572,29 +589,34 @@ public class PlayerController : MonoBehaviour
     private void HandleBobbing()
     {
         float bobbingSpeed = 0f;
+        float currentBobbingAmount = 0f; // New variable for the current bobbing amount
 
-        if (currentState == PlayerState.Idle || controller.velocity.magnitude > 0.1f) // Add a condition to check if player is moving for states other than idle
+        if (currentState == PlayerState.Idle || controller.velocity.magnitude > 0.1f)
         {
             switch (currentState)
             {
                 case PlayerState.Idle:
                     bobbingSpeed = idleBobbingSpeed;
+                    currentBobbingAmount = idleBobbingAmount;
                     break;
                 case PlayerState.Walking:
                     bobbingSpeed = walkBobbingSpeed;
+                    currentBobbingAmount = walkBobbingAmount;
                     break;
                 case PlayerState.Running:
                     bobbingSpeed = runBobbingSpeed;
+                    currentBobbingAmount = runBobbingAmount;
                     break;
                 case PlayerState.Boosting:
                     bobbingSpeed = boostBobbingSpeed;
+                    currentBobbingAmount = boostBobbingAmount;
                     break;
             }
 
             bobbingCounter += Time.deltaTime * bobbingSpeed;
             playerCamera.transform.localPosition = new Vector3(
                 playerCamera.transform.localPosition.x,
-                defaultCameraYPos + Mathf.Sin(bobbingCounter) * bobbingAmount,
+                defaultCameraYPos + Mathf.Sin(bobbingCounter) * currentBobbingAmount, // Use current bobbing amount here
                 playerCamera.transform.localPosition.z
             );
         }
