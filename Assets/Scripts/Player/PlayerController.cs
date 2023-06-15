@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour
     // Variables for boosting
     public float boostSpeed = 2.0f; // Adjust as needed
     public bool boostAvailable = true; // Adjust as needed
-
+    private bool boostUsed = false;
 
     // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
@@ -170,20 +170,9 @@ public class PlayerController : MonoBehaviour
     private float footstepCounter = 0f;
 
     // Public getters for current health, stamina, and boost
-    public float CurrentHealth
-    {
-        get { return currentHealth; }
-    }
-
-    public float CurrentStamina
-    {
-        get { return currentStamina; }
-    }
-
-    public float CurrentBoost
-    {
-        get { return currentBoost; }
-    }
+    public float CurrentHealth => currentHealth;
+    public float CurrentStamina => currentStamina;
+    public float CurrentBoost => currentBoost;
 
     void Start()
     {
@@ -349,11 +338,19 @@ public class PlayerController : MonoBehaviour
             hasJumped = true; // Set hasJumped to true after a jump
         }
 
-        // Add the condition that boosting can only happen after jumping
-        if (Input.GetKey(KeyCode.Space) && hasJumped && !isBoosting && boostAvailable)
+        if (isGrounded)
+        {
+            boostAvailable = true; // Reset boost availability when grounded
+            boostUsed = false; // Reset boost usage when grounded
+        }
+
+        // Add the condition that boosting can only happen after jumping and when boost is available
+        if (Input.GetButton("Boost") && hasJumped && boostAvailable && !boostUsed)
         {
             velocity += boostDirection * boostSpeed; // Adjust the velocity by the boost speed in the direction of movement
             isBoosting = true;
+            boostUsed = true; // Set boost as used
+            boostAvailable = false; // Disable boost availability until grounded again
         }
 
         velocity.y += gravity * Time.deltaTime;
@@ -373,8 +370,7 @@ public class PlayerController : MonoBehaviour
             actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
             actionSource.PlayOneShot(landSound);
             hasJumped = false; // Reset the hasJumped flag after landing
-                               // As the player has landed, boosting is also reset
-            isBoosting = false;
+            isBoosting = false; // Reset the isBoosting flag after landing
         }
         wasGrounded = isGrounded;
     }
