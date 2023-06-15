@@ -130,6 +130,7 @@ public class PlayerController : MonoBehaviour
     private float originalGravity;
     private Dictionary<KeyCode, float> boostForces;
 
+    private bool hasBoosted = false;
     private bool canRun = true;
     private bool canJump = true;
     private bool isGrounded;
@@ -143,6 +144,15 @@ public class PlayerController : MonoBehaviour
     private bool isFallingAfterBoost = false;
     private float bobbingCounter = 0f;
     private float defaultCameraYPos;
+
+    public float jumpHeight = 2.0f;
+    // Variables for gravity
+    public float gravity = -9.81f; // Standard gravity value
+
+    // Variables for boosting
+    public float boostSpeed = 2.0f; // Adjust as needed
+    public bool boostAvailable = true; // Adjust as needed
+
 
     // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
@@ -232,6 +242,9 @@ public class PlayerController : MonoBehaviour
 
         HandleBobbing();
 
+        // Ground check
+        bool isGrounded = IsPlayerGrounded();
+
         // Handle stamina
         if (currentState == PlayerState.Running && isGrounded && currentStamina > 0) // Ensure player is on the ground before draining stamina when running
         {
@@ -309,6 +322,43 @@ public class PlayerController : MonoBehaviour
         float healthAlpha = healthRatio > 0 ? 1f : 0f;
         playerUIController.SetHealthHandleAlpha(healthAlpha);
     }
+    bool IsPlayerGrounded()
+    {
+        // The length of the ray
+        float distanceToGround = 0.1f;
+
+        // Raycast down from the player's position
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, distanceToGround))
+        {
+            // Check if the GameObject hit by the ray has the "Ground" tag
+            if (hit.collider.gameObject.CompareTag("Ground"))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void ProcessPlayerJumpAndBoost()
+    {
+        if (isGrounded && Input.GetButtonDown("Jump") && canJump)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            hasJumped = true; // Set hasJumped to true after a jump
+        }
+
+        // Add the condition that boosting can only happen after jumping
+        if (Input.GetKey(KeyCode.Space) && hasJumped && !isBoosting && boostAvailable)
+        {
+            velocity += boostDirection * boostSpeed; // Adjust the velocity by the boost speed in the direction of movement
+            isBoosting = true;
+        }
+
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
 
     private void ProcessGroundState()
     {
@@ -323,9 +373,12 @@ public class PlayerController : MonoBehaviour
             actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
             actionSource.PlayOneShot(landSound);
             hasJumped = false; // Reset the hasJumped flag after landing
+                               // As the player has landed, boosting is also reset
+            isBoosting = false;
         }
         wasGrounded = isGrounded;
     }
+
     private void ProcessPlayerMovement()
     {
         float moveSpeed;
@@ -344,15 +397,6 @@ public class PlayerController : MonoBehaviour
 
         // Change the state to Idle if there's no movement
         if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
-
-        // Add a section to handle FOV in ProcessJumpInput
-        if (Input.GetButtonDown("Jump") && canJump)
-        {
-            if (isGrounded)
-            {
-                if (currentState == PlayerState.Running) currentState = PlayerState.Boosting;
-            }
-        }
 
         isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
 
@@ -385,6 +429,7 @@ public class PlayerController : MonoBehaviour
             playerCamera.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, playerCamera.transform.localEulerAngles.y, newLeanAngle);
         }
     }
+
     private void ProcessPlayerFOV()
     {
         float targetFOV = defaultFOV;
