@@ -184,6 +184,4 @@ public class SwordController : MonoBehaviour
         float newY = initialPosition.y + Mathf.Sin(Time.time * bobSpeed) * bobAmount;
         transform.localPosition = new Vector3(transform.localPosition.x, newY, transform.localPosition.z);
     }
-
-    // Swing and Jab methods remain the same as the previous version, but you may want to modify them to use the animation curves.
 }

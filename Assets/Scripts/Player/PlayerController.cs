@@ -22,6 +22,12 @@ public class PlayerController : MonoBehaviour
     private float boostForceS = 45f;
     [SerializeField, Tooltip("Boost force for 'D' key")]
     private float boostForceD = 55f;
+    public float moveSpeed = 5f;
+    [Tooltip("The speed at which the player falls after a jump")]
+    public float fallSpeed = 2.5f;
+
+    private bool isJumping = false;
+    private bool isFalling = false;
 
     [Header("Boost Variables")]
     // Variables for gravity
@@ -280,6 +286,18 @@ public class PlayerController : MonoBehaviour
             canJump = true;
         }
 
+        // Handle horizontal movement
+
+        if (Input.GetButtonDown("Jump") && !isJumping)
+        {
+            Jump();
+        }
+
+        if (isFalling)
+        {
+            Fall();
+        }
+
         // Handle boost
         if (currentState == PlayerState.Boosting && currentBoost >= 0)
         {
@@ -347,6 +365,20 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
+    }
+    private void Jump()
+    {
+        // Assuming you're using a Rigidbody or CharacterController for movement
+        // Add force or change velocity for a jump
+        isJumping = true;
+    }
+
+    private void Fall()
+    {
+        // Decrease the y velocity to simulate a fall
+        // This would be done differently depending on whether you're using a Rigidbody or CharacterController
+        isJumping = false;
+        isFalling = true;
     }
 
     private void ProcessPlayerJumpAndBoost()
