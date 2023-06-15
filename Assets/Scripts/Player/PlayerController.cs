@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     private float runSpeed = 6f;
     [SerializeField, Tooltip("Jump force for the regular jump")]
     private float jumpForce = 2f;
+    public float jumpHeight = 2.0f;
     [SerializeField, Tooltip("Boost force for 'W' key")]
     private float boostForceW = 65f;
     [SerializeField, Tooltip("Boost force for 'A' key")]
@@ -21,6 +22,20 @@ public class PlayerController : MonoBehaviour
     private float boostForceS = 45f;
     [SerializeField, Tooltip("Boost force for 'D' key")]
     private float boostForceD = 55f;
+
+    [Header("Boost Variables")]
+    // Variables for gravity
+    public float gravity = -9.81f; // Standard gravity value
+    // Variables for boosting
+    public float boostSpeed = 2.0f; // Adjust as needed
+    public bool boostAvailable = true; // Adjust as needed
+    private bool boostUsed = false;
+    [SerializeField]
+    private float boostYForce = 1.2f;
+
+    [Header("Gravity Control")]
+    [SerializeField, Tooltip("Gravity multiplier after boosting")]
+    private float boostedGravityMultiplier = 2f;
 
     [Header("Camera Bobbing")]
     [SerializeField, Tooltip("Bobbing speed when idle")]
@@ -33,10 +48,6 @@ public class PlayerController : MonoBehaviour
     private float boostBobbingSpeed = 1.5f;
     [SerializeField, Tooltip("Bobbing amount")]
     private float bobbingAmount = 0.05f;
-
-    [Header("Gravity Control")]
-    [SerializeField, Tooltip("Gravity multiplier after boosting")]
-    private float boostedGravityMultiplier = 2f;
 
     [Header("Mouse Look")]
     [SerializeField, Tooltip("Mouse sensitivity")]
@@ -144,15 +155,6 @@ public class PlayerController : MonoBehaviour
     private bool isFallingAfterBoost = false;
     private float bobbingCounter = 0f;
     private float defaultCameraYPos;
-
-    public float jumpHeight = 2.0f;
-    // Variables for gravity
-    public float gravity = -9.81f; // Standard gravity value
-
-    // Variables for boosting
-    public float boostSpeed = 2.0f; // Adjust as needed
-    public bool boostAvailable = true; // Adjust as needed
-    private bool boostUsed = false;
 
     // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
@@ -528,9 +530,11 @@ public class PlayerController : MonoBehaviour
         isBoosting = true;
         float boostTimer = 0.5f;  // Adjust this value to control the duration of the boost
 
+        Vector3 boostDirectionWithY = new Vector3(boostDirection.x, boostYForce, boostDirection.z); // Creating a new vector with Y value to lift the player upwards
+
         while (boostTimer > 0)
         {
-            velocity += boostDirection * boostForces[key] * Time.deltaTime;
+            velocity += boostDirectionWithY.normalized * boostForces[key] * Time.deltaTime; // Use the modified boost direction
             boostTimer -= Time.deltaTime;
             yield return null;
         }
