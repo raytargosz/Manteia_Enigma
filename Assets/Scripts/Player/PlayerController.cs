@@ -114,26 +114,42 @@ public class PlayerController : MonoBehaviour
 
     // Sound Settings
     [Header("Sound Settings")]
+    [Tooltip("AudioSource for footstep sounds")]
     public AudioSource footstepSource;
+
+    [Tooltip("AudioSource for action sounds")]
     public AudioSource actionSource;
+
+    [Tooltip("AudioSource for turn sounds")]
     public AudioSource turnSource;
-    public float turnCooldown = 0.5f;
-    private float lastTurnTime = 0f;
+
+    [Tooltip("Array of different surface footstep sounds")]
     public SurfaceFootstepSFX[] footstepSFXs;
+
+    [Tooltip("Indicates whether the player is currently turning")]
     private bool isTurning = false;
-    [SerializeField, Tooltip("Jump sound")]
+
+    [SerializeField, Tooltip("Sound clip for jump action")]
     private AudioClip jumpSound;
-    [SerializeField, Tooltip("Land sound")]
+
+    [SerializeField, Tooltip("Sound clip for landing action")]
     private AudioClip landSound;
-    [SerializeField, Tooltip("Boost sound for 'W' key")]
+
+    [SerializeField, Tooltip("Boost sound clip for 'W' key")]
     private BoostSound boostSoundW;
-    [SerializeField, Tooltip("Boost sound for 'A' key")]
+
+    [SerializeField, Tooltip("Boost sound clip for 'A' key")]
     private BoostSound boostSoundA;
-    [SerializeField, Tooltip("Boost sound for 'S' key")]
+
+    [SerializeField, Tooltip("Boost sound clip for 'S' key")]
     private BoostSound boostSoundS;
-    [SerializeField, Tooltip("Boost sound for 'D' key")]
+
+    [SerializeField, Tooltip("Boost sound clip for 'D' key")]
     private BoostSound boostSoundD;
+
+    [Tooltip("Dictionary mapping key codes to their associated boost sounds")]
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
+
 
     // Footstep Interval
     [Header("Footstep Interval")]
@@ -141,6 +157,8 @@ public class PlayerController : MonoBehaviour
     private float walkFootstepInterval = 0.5f;
     [SerializeField, Tooltip("Interval for footstep sounds when running")]
     private float runFootstepInterval = 0.3f;
+    public float turnCooldown = 0.5f;
+    private float lastTurnTime = 0f;
 
     // Sound Pitch Variation
     [Header("Sound Pitch Variation")]
@@ -176,26 +194,51 @@ public class PlayerController : MonoBehaviour
     private PlayerUIController playerUIController;
 
     // Sound SFX Structure
+    // This structure is used to organize the various audio clips and their pitch variations 
+    // for different player actions and surface interactions.
     [System.Serializable]
     public struct SurfaceFootstepSFX
     {
+        [Tooltip("Tag to identify the type of surface (e.g., 'Grass', 'Concrete')")]
         public string tag;
+
         [Header("Sounds")]
+
+        [Tooltip("Array of sound clips for walking footsteps")]
         public AudioClip[] walkSounds;
+
+        [Tooltip("Array of sound clips for running footsteps")]
         public AudioClip[] runSounds;
+
+        [Tooltip("Array of sound clips for jumps")]
         public AudioClip[] jumpSounds;
+
+        [Tooltip("Array of sound clips for landing from a jump")]
         public AudioClip[] landSounds;
+
+        [Tooltip("Sound clip for turning")]
         public AudioClip turnSound;
+
         [Header("Pitch Variation")]
+
+        [Tooltip("Range of possible pitch adjustments for walk sounds (to add variety)")]
         public Vector2 walkPitchRange;
+
+        [Tooltip("Range of possible pitch adjustments for run sounds (to add variety)")]
         public Vector2 runPitchRange;
+
+        [Tooltip("Range of possible pitch adjustments for jump sounds (to add variety)")]
         public Vector2 jumpPitchRange;
+
+        [Tooltip("Range of possible pitch adjustments for land sounds (to add variety)")]
         public Vector2 landPitchRange;
+
+        [Tooltip("Range of possible pitch adjustments for turn sounds (to add variety)")]
         public Vector2 turnPitchRange;
     }
 
-// Add a variable to track the current player state
-private PlayerState currentState = PlayerState.Idle;
+    // Add a variable to track the current player state
+    private PlayerState currentState = PlayerState.Idle;
     public enum PlayerState
     {
         Idle,
