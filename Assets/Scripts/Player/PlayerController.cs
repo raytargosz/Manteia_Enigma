@@ -273,9 +273,9 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (other.gameObject.tag == "Ladder")
+        if (hit.gameObject.CompareTag("Ladder"))
         {
             isClimbing = true;
         }
@@ -283,7 +283,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Ladder")
+        if (other.gameObject.CompareTag("Ladder"))
         {
             isClimbing = false;
         }
@@ -562,9 +562,22 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessPlayerMovement()
     {
-        if (isClimbing)
+        if (isClimbing && Input.GetAxis("Vertical") != 0)
         {
-            ClimbLadder();
+            // Player is climbing
+            Vector3 up = playerCamera.transform.up;
+            Vector3 forward = playerCamera.transform.forward;
+            Vector3 right = playerCamera.transform.right;
+            Vector3 moveDirection = (up * Input.GetAxis("Vertical") + right * Input.GetAxis("Horizontal")).normalized;
+
+            if (Vector3.Dot(moveDirection, forward) > 0.5f)  // Player is looking upwards
+            {
+                controller.Move(moveDirection * climbSpeed * Time.deltaTime);
+            }
+            else if (Vector3.Dot(moveDirection, -forward) > 0.5f)  // Player is looking downwards
+            {
+                controller.Move(-moveDirection * climbSpeed * Time.deltaTime);
+            }
         }
         else
         {
