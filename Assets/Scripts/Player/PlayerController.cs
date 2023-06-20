@@ -6,6 +6,15 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    // Character Controller
+    private CharacterController controller;
+
+    // Camera Settings
+    private Camera playerCamera;
+    private float defaultCameraYPos;
+    private float bobbingCounter = 0f;
+
+    // Player Movement Settings
     [Header("Movement")]
     [SerializeField, Tooltip("Normal speed of the player")]
     private float walkSpeed = 3f;
@@ -14,6 +23,41 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Jump force for the regular jump")]
     private float jumpForce = 2f;
     public float jumpHeight = 2.0f;
+    public float moveSpeed = 5f;
+    [Tooltip("The speed at which the player falls after a jump")]
+    public float fallSpeed = 2.5f;
+    private bool isJumping = false;
+    private bool isFalling = false;
+    private bool hasJumped = false;
+    private bool isGrounded;
+    private bool wasGrounded;
+    private bool isRunning = false;
+    private bool canRun = true;
+    private bool canJump = true;
+    private Vector3 velocity;
+    private float originalGravity;
+    private bool rightFootNext = true;
+
+    // Jump Settings
+    [SerializeField, Tooltip("Max time the jump button can be held")]
+    private float jumpTime = 0.35f;
+    private float jumpTimeCounter;
+
+    // Boost Settings
+    [Header("Boost Variables")]
+    [SerializeField, Tooltip("Gravity multiplier after boosting")]
+    private float boostedGravityMultiplier = 2f;
+    public float gravity = -9.81f;
+    private bool isBoosting = false;
+    private bool canBoost = false;
+    private Vector3 boostDirection = Vector3.zero;
+    private bool isFallingAfterBoost = false;
+    private bool hasBoosted = false;
+    private bool boostUsed = false; // This flag checks whether the boost has been used or not
+    private float boostCooldownTimer = 0f; // This timer keeps track of the cooldown state
+    private bool boostAvailable = true; // This flag checks whether the boost is available or not
+    private float boostSpeed = 20f; // Speed of the boost. You can adjust this to your needs
+    private float boostYForce = 1f; // Vertical force applied during a boost. Adjust as needed
     [SerializeField, Tooltip("Boost force for 'W' key")]
     private float boostForceW = 65f;
     [SerializeField, Tooltip("Boost force for 'A' key")]
@@ -22,55 +66,35 @@ public class PlayerController : MonoBehaviour
     private float boostForceS = 45f;
     [SerializeField, Tooltip("Boost force for 'D' key")]
     private float boostForceD = 55f;
-    public float moveSpeed = 5f;
-    [Tooltip("The speed at which the player falls after a jump")]
-    public float fallSpeed = 2.5f;
-
-    private bool isJumping = false;
-    private bool isFalling = false;
-
-    [Header("Boost Variables")]
-    // Variables for gravity
-    public float gravity = -9.81f; // Standard gravity value
-    // Variables for boosting
-    public float boostSpeed = 2.0f; // Adjust as needed
-    public bool boostAvailable = true; // Adjust as needed
-    private bool boostUsed = false;
+    private Dictionary<KeyCode, float> boostForces;
     [SerializeField]
-    private float boostYForce = 1.2f;
+    private float boostCooldown = 3f;
 
-    [Header("Gravity Control")]
-    [SerializeField, Tooltip("Gravity multiplier after boosting")]
-    private float boostedGravityMultiplier = 2f;
-
-
+    // Camera Bobbing
     [Header("Camera Bobbing")]
-
     [SerializeField, Tooltip("Bobbing speed when idle")]
     private float idleBobbingSpeed = 0.5f;
     [SerializeField]
     private float idleBobbingAmount = 0.05f;
-
     [SerializeField, Tooltip("Bobbing speed when walking")]
     private float walkBobbingSpeed = 0.8f;
     [SerializeField]
     private float walkBobbingAmount = 0.1f;
-
     [SerializeField, Tooltip("Bobbing speed when running")]
     private float runBobbingSpeed = 1.2f;
     [SerializeField]
     private float runBobbingAmount = 0.15f;
-
     [SerializeField, Tooltip("Bobbing speed when boosting")]
     private float boostBobbingSpeed = 1.5f;
     [SerializeField]
     private float boostBobbingAmount = 0.2f;
 
+    // Mouse Look
     [Header("Mouse Look")]
     [SerializeField, Tooltip("Mouse sensitivity")]
     private float mouseSensitivity = 100f;
 
-
+    // Field of View
     [Header("Field of View")]
     [SerializeField, Tooltip("Default Field of View")]
     private float defaultFOV = 60f;
@@ -81,17 +105,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Transition speed between FOVs")]
     private float fovTransitionSpeed = 5f;
 
+    // Lean Effect
     [Header("Lean Effect")]
     [SerializeField, Tooltip("Max lean angle in degrees")]
     private float maxLeanAngle = 10f;
     [SerializeField, Tooltip("Speed of transitioning to max lean")]
     private float leanSpeed = 5f;
 
-    [Header("Sounds")]
-    [SerializeField, Tooltip("Right footstep sound")]
-    private AudioClip rightFootstepSound;
-    [SerializeField, Tooltip("Left footstep sound")]
-    private AudioClip leftFootstepSound;
+    // Sound Settings
+    [Header("Sound Settings")]
+    public AudioSource footstepSource;
+    public AudioSource actionSource;
+    public AudioSource turnSource;
+    public float turnCooldown = 0.5f;
+    private float lastTurnTime = 0f;
+    public SurfaceFootstepSFX[] footstepSFXs;
+    private bool isTurning = false;
     [SerializeField, Tooltip("Jump sound")]
     private AudioClip jumpSound;
     [SerializeField, Tooltip("Land sound")]
@@ -104,78 +133,69 @@ public class PlayerController : MonoBehaviour
     private BoostSound boostSoundS;
     [SerializeField, Tooltip("Boost sound for 'D' key")]
     private BoostSound boostSoundD;
+    private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
 
+    // Footstep Interval
     [Header("Footstep Interval")]
     [SerializeField, Tooltip("Interval for footstep sounds when walking")]
     private float walkFootstepInterval = 0.5f;
     [SerializeField, Tooltip("Interval for footstep sounds when running")]
     private float runFootstepInterval = 0.3f;
 
+    // Sound Pitch Variation
     [Header("Sound Pitch Variation")]
     [SerializeField, Tooltip("Min and max pitch for walking footsteps")]
     private Vector2 walkPitchRange = new Vector2(0.9f, 1.1f);
     [SerializeField, Tooltip("Min and max pitch for running and jumping")]
     private Vector2 runJumpPitchRange = new Vector2(0.8f, 1.2f);
 
+    // Player Stats
     [Header("Player Stats")]
     [SerializeField, Tooltip("Max stamina")]
     private float maxStamina = 100f;
     private float currentStamina;
-
     [SerializeField, Tooltip("Max boost")]
     private float maxBoost = 100f;
     private float currentBoost;
-
-    [SerializeField, Tooltip("Stamina depletion rate when running")]
-    private float staminaDepletionRate = 10f;
-
-    [SerializeField, Tooltip("Boost depletion rate")]
-    private float boostDepletionRate = 33.3f; // Amount of boost depleted per second when boosting
-
-    [SerializeField, Tooltip("Stamina cost for jumping")]
-    private float staminaJumpCost = 20f; // Stamina cost for jumping
-
-    [SerializeField, Tooltip("Stamina regeneration rate")]
-    private float staminaRegenSpeed = 20f; // Stamina regenerated per second when not running
-
-    [SerializeField, Tooltip("Boost regeneration rate")]
-    private float boostRegenSpeed = 10f; // Boost regenerated per second when not boosting
-
     [SerializeField, Tooltip("Max health")]
     private float maxHealth = 100f;
     private float currentHealth;
+    [SerializeField, Tooltip("Stamina depletion rate when running")]
+    private float staminaDepletionRate = 10f;
+    [SerializeField, Tooltip("Boost depletion rate")]
+    private float boostDepletionRate = 33.3f; // Amount of boost depleted per second when boosting
+    [SerializeField, Tooltip("Stamina cost for jumping")]
+    private float staminaJumpCost = 20f; // Stamina cost for jumping
+    [SerializeField, Tooltip("Stamina regeneration rate")]
+    private float staminaRegenSpeed = 20f; // Stamina regenerated per second when not running
+    [SerializeField, Tooltip("Boost regeneration rate")]
+    private float boostRegenSpeed = 10f; // Boost regenerated per second when not boosting
 
-    [SerializeField, Tooltip("Map of boost sounds to keys")]
-    private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
-
+    // Player UI
     [SerializeField]
     private PlayerUIController playerUIController;
 
-    // Non-Serialized Fields
-    private CharacterController controller;
-    private Vector3 velocity;
-    private Camera playerCamera;
-    private AudioSource footstepSource, actionSource;
-    private float originalGravity;
-    private Dictionary<KeyCode, float> boostForces;
+    // Sound SFX Structure
+    [System.Serializable]
+    public struct SurfaceFootstepSFX
+    {
+        public string tag;
+        [Header("Sounds")]
+        public AudioClip[] walkSounds;
+        public AudioClip[] runSounds;
+        public AudioClip[] jumpSounds;
+        public AudioClip[] landSounds;
+        public AudioClip turnSound;
+        [Header("Pitch Variation")]
+        public Vector2 walkPitchRange;
+        public Vector2 runPitchRange;
+        public Vector2 jumpPitchRange;
+        public Vector2 landPitchRange;
+        public Vector2 turnPitchRange;
+    }
 
-    private bool hasBoosted = false;
-    private bool canRun = true;
-    private bool canJump = true;
-    private bool isGrounded;
-    private bool isRunning = false;
-    private bool canBoost = false;
-    private bool rightFootNext = true;
-    private bool wasGrounded;
-    private bool hasJumped = false;
-    private bool isBoosting = false;
-    private Vector3 boostDirection = Vector3.zero;
-    private bool isFallingAfterBoost = false;
-    private float bobbingCounter = 0f;
-    private float defaultCameraYPos;
-
-    // Add a variable to track the current player state
-    private PlayerState currentState = PlayerState.Idle;
+// Add a variable to track the current player state
+private PlayerState currentState = PlayerState.Idle;
     public enum PlayerState
     {
         Idle,
@@ -198,6 +218,11 @@ public class PlayerController : MonoBehaviour
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
     public float CurrentBoost => currentBoost;
+
+    private void Awake()
+    {
+        controller = GetComponent<CharacterController>();
+    }
 
     void Start()
     {
@@ -347,7 +372,15 @@ public class PlayerController : MonoBehaviour
         // Handle health alpha
         float healthAlpha = healthRatio > 0 ? 1f : 0f;
         playerUIController.SetHealthHandleAlpha(healthAlpha);
+
+        if (!isGrounded)
+        {
+            // Apply gravity
+            velocity.y += gravity * Time.deltaTime;
+        }
+        controller.Move(velocity * Time.deltaTime);
     }
+
     bool IsPlayerGrounded()
     {
         // The length of the ray
@@ -370,6 +403,7 @@ public class PlayerController : MonoBehaviour
     {
         // Assuming you're using a Rigidbody or CharacterController for movement
         // Add force or change velocity for a jump
+        velocity.y = jumpForce;
         isJumping = true;
     }
 
@@ -379,6 +413,7 @@ public class PlayerController : MonoBehaviour
         // This would be done differently depending on whether you're using a Rigidbody or CharacterController
         isJumping = false;
         isFalling = true;
+        velocity.y -= fallSpeed * Time.deltaTime;
     }
 
     private void ProcessPlayerJumpAndBoost()
@@ -391,8 +426,23 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
-            boostAvailable = true; // Reset boost availability when grounded
+            // Once grounded, start the cooldown timer before boost becomes available
+            if (boostUsed && boostCooldownTimer <= 0f)
+            {
+                boostCooldownTimer = boostCooldown;
+            }
             boostUsed = false; // Reset boost usage when grounded
+        }
+
+        // Once boost has been used, start counting down the cooldown timer
+        if (boostCooldownTimer > 0f)
+        {
+            boostCooldownTimer -= Time.deltaTime;
+            // Only make boost available again once cooldown timer is up
+            if (boostCooldownTimer <= 0f)
+            {
+                boostAvailable = true;
+            }
         }
 
         // Add the condition that boosting can only happen after jumping and when boost is available
@@ -400,8 +450,9 @@ public class PlayerController : MonoBehaviour
         {
             velocity += boostDirection * boostSpeed; // Adjust the velocity by the boost speed in the direction of movement
             isBoosting = true;
-            boostUsed = true; // Set boost as used
-            boostAvailable = false; // Disable boost availability until grounded again
+            // After using the boost, make it unavailable and mark it as used
+            boostAvailable = false;
+            boostUsed = true;
         }
 
         velocity.y += gravity * Time.deltaTime;
@@ -574,6 +625,45 @@ public class PlayerController : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 
+    private void ProcessJump()
+    {
+        if (isGrounded && Input.GetButtonDown("Jump") && canJump)
+        {
+            isJumping = true;
+            jumpTimeCounter = jumpTime;
+            velocity.y = jumpForce;  // Set the vertical velocity here
+            SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+            footstepSource.pitch = Random.Range(sfx.jumpPitchRange.x, sfx.jumpPitchRange.y);
+            footstepSource.PlayOneShot(sfx.jumpSounds[Random.Range(0, sfx.jumpSounds.Length)]);
+        }
+        if (Input.GetButton("Jump") && isJumping)
+        {
+            if (jumpTimeCounter > 0)
+            {
+                jumpTimeCounter -= Time.deltaTime;
+            }
+            else
+            {
+                isJumping = false;
+            }
+        }
+        if (Input.GetButtonUp("Jump"))
+        {
+            isJumping = false;
+        }
+    }
+
+    private void ProcessLand()
+    {
+        if (!wasGrounded && isGrounded)
+        {
+            SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+            footstepSource.pitch = Random.Range(sfx.landPitchRange.x, sfx.landPitchRange.y);
+            footstepSource.PlayOneShot(sfx.landSounds[Random.Range(0, sfx.landSounds.Length)]);
+        }
+    }
+
+
     private IEnumerator Boost(KeyCode key)
     {
         isBoosting = true;
@@ -604,21 +694,56 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
 
-        if (isGrounded && move.magnitude > 0)
+        if (isGrounded)
         {
-            footstepCounter -= Time.deltaTime;
-            if (footstepCounter <= 0)
+            if (move.magnitude > 0)
             {
-                AudioClip nextFootstepSound = rightFootNext ? rightFootstepSound : leftFootstepSound;
-                footstepSource.pitch = (currentState == PlayerState.Running) ? Random.Range(runJumpPitchRange.x, runJumpPitchRange.y) : Random.Range(walkPitchRange.x, walkPitchRange.y);
-                footstepSource.PlayOneShot(nextFootstepSound);
-                rightFootNext = !rightFootNext;
-                footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
+                footstepCounter -= Time.deltaTime;
+                if (footstepCounter <= 0)
+                {
+                    SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+                    AudioClip nextFootstepSound = rightFootNext ? sfx.walkSounds[Random.Range(0, sfx.walkSounds.Length)] : sfx.runSounds[Random.Range(0, sfx.runSounds.Length)];
+                    footstepSource.pitch = (currentState == PlayerState.Running) ? Random.Range(sfx.runPitchRange.x, sfx.runPitchRange.y) : Random.Range(sfx.walkPitchRange.x, sfx.walkPitchRange.y);
+                    footstepSource.PlayOneShot(nextFootstepSound);
+                    rightFootNext = !rightFootNext;
+                    footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
+                }
+            }
+
+            if (Input.GetAxis("Mouse X") != 0 && Time.time > lastTurnTime + turnCooldown)
+            {
+                SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+                turnSource.pitch = Random.Range(sfx.turnPitchRange.x, sfx.turnPitchRange.y);
+                turnSource.PlayOneShot(sfx.turnSound);
+                lastTurnTime = Time.time;
             }
         }
     }
 
-    private void HandleBobbing()
+
+
+    private SurfaceFootstepSFX GetFootstepSFXForCurrentSurface()
+    {
+        // Use raycast or similar method to determine the tag of the ground surface
+        // Assume the RaycastHit is stored in a variable hit
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 1f))
+        {
+            foreach (SurfaceFootstepSFX sfx in footstepSFXs)
+            {
+                if (sfx.tag == hit.collider.gameObject.tag)
+                {
+                    return sfx;
+                }
+            }
+        }
+
+        // Default to the first SFX if the ground surface tag wasn't found in the array
+        return footstepSFXs[0];
+    }
+
+private void HandleBobbing()
     {
         float bobbingSpeed = 0f;
         float currentBobbingAmount = 0f; // New variable for the current bobbing amount
