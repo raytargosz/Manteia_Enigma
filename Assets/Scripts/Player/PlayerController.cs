@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour
 
     // Sound Settings
     [Header("Sound Settings")]
+
     [Tooltip("AudioSource for footstep sounds")]
     public AudioSource footstepSource;
 
@@ -196,6 +197,7 @@ public class PlayerController : MonoBehaviour
     // Sound SFX Structure
     // This structure is used to organize the various audio clips and their pitch variations 
     // for different player actions and surface interactions.
+    // Sound SFX Structure
     [System.Serializable]
     public struct SurfaceFootstepSFX
     {
@@ -203,7 +205,6 @@ public class PlayerController : MonoBehaviour
         public string tag;
 
         [Header("Sounds")]
-
         [Tooltip("Array of sound clips for walking footsteps")]
         public AudioClip[] walkSounds;
 
@@ -216,11 +217,10 @@ public class PlayerController : MonoBehaviour
         [Tooltip("Array of sound clips for landing from a jump")]
         public AudioClip[] landSounds;
 
-        [Tooltip("Sound clip for turning")]
-        public AudioClip turnSound;
+        [Tooltip("Array of sound clips for turning")]
+        public AudioClip[] turnSounds; // Turn sound is now an array
 
         [Header("Pitch Variation")]
-
         [Tooltip("Range of possible pitch adjustments for walk sounds (to add variety)")]
         public Vector2 walkPitchRange;
 
@@ -501,7 +501,6 @@ public class PlayerController : MonoBehaviour
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
-
     private void ProcessGroundState()
     {
         isGrounded = controller.isGrounded;
@@ -706,7 +705,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     private IEnumerator Boost(KeyCode key)
     {
         isBoosting = true;
@@ -753,40 +751,43 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if (Input.GetAxis("Mouse X") != 0 && Time.time > lastTurnTime + turnCooldown)
+            // Check if player state is idle before playing the turning sound
+            if (currentState == PlayerState.Idle && Input.GetAxis("Mouse X") != 0 && Time.time > lastTurnTime + turnCooldown)
             {
                 SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+                AudioClip turnSound = sfx.turnSounds[Random.Range(0, sfx.turnSounds.Length)];
                 turnSource.pitch = Random.Range(sfx.turnPitchRange.x, sfx.turnPitchRange.y);
-                turnSource.PlayOneShot(sfx.turnSound);
+                turnSource.PlayOneShot(turnSound);
                 lastTurnTime = Time.time;
             }
         }
     }
 
-
-
     private SurfaceFootstepSFX GetFootstepSFXForCurrentSurface()
     {
-        // Use raycast or similar method to determine the tag of the ground surface
-        // Assume the RaycastHit is stored in a variable hit
-
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.up, out hit, 1f))
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 2f))
         {
+            string surfaceTag = hit.collider.gameObject.tag;
+            Debug.Log("Surface tag detected: " + surfaceTag);
+
             foreach (SurfaceFootstepSFX sfx in footstepSFXs)
             {
-                if (sfx.tag == hit.collider.gameObject.tag)
+                Debug.Log("Checking SFX for tag: " + sfx.tag);
+
+                if (sfx.tag == surfaceTag)
                 {
+                    Debug.Log("Matched SFX found for tag: " + sfx.tag);
                     return sfx;
                 }
             }
         }
 
-        // Default to the first SFX if the ground surface tag wasn't found in the array
+        Debug.Log("No matched SFX found, defaulting to first in list");
         return footstepSFXs[0];
     }
 
-private void HandleBobbing()
+    private void HandleBobbing()
     {
         float bobbingSpeed = 0f;
         float currentBobbingAmount = 0f; // New variable for the current bobbing amount

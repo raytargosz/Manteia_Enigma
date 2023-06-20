@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Walls
   - Objects
+  - Ground_Grass
+  - Ground_Wood
   layers:
   - Default
   - TransparentFX

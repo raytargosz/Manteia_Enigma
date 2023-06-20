@@ -716,50 +716,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 69134929}
   m_CullTransparentMesh: 1
---- !u!1 &83445947
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 83445948}
-  - component: {fileID: 83445949}
-  m_Layer: 0
-  m_Name: Custom FX
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &83445948
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 83445947}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &83445949
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 83445947}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &104138186
 GameObject:
   m_ObjectHideFlags: 0
@@ -774,7 +730,7 @@ GameObject:
   - component: {fileID: 104138188}
   m_Layer: 0
   m_Name: Cube (5)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -879,7 +835,7 @@ GameObject:
   - component: {fileID: 124325708}
   m_Layer: 0
   m_Name: Plane (45)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -985,7 +941,7 @@ GameObject:
   - component: {fileID: 130203173}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1288,6 +1244,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 137093467}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &158374691
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 158374692}
+  - component: {fileID: 158374693}
+  m_Layer: 0
+  m_Name: Post FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &158374692
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158374691}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &158374693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158374691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &163297164
 GameObject:
   m_ObjectHideFlags: 0
@@ -1408,7 +1408,7 @@ GameObject:
   - component: {fileID: 175081043}
   m_Layer: 0
   m_Name: Plane (3)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1620,7 +1620,7 @@ GameObject:
   - component: {fileID: 182115874}
   m_Layer: 0
   m_Name: Cube (11)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1711,65 +1711,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 182115872}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &186526520
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 186526523}
-  - component: {fileID: 186526522}
-  - component: {fileID: 186526521}
-  m_Layer: 0
-  m_Name: Wind Zone
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!182 &186526521
-WindZone:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186526520}
-  m_Enabled: 1
-  m_Mode: 0
-  m_Radius: 20
-  m_WindMain: 0.5
-  m_WindTurbulence: 1
-  m_WindPulseMagnitude: 0.5
-  m_WindPulseFrequency: 0.01
---- !u!114 &186526522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186526520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &186526523
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186526520}
-  m_LocalRotation: {x: -0, y: 0.90109473, z: -0, w: -0.43362227}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &201392203 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1103392441193992, guid: a5caec3cf905ef9409f3dd8e824ecac7, type: 3}
@@ -1789,7 +1730,7 @@ GameObject:
   - component: {fileID: 204640044}
   m_Layer: 0
   m_Name: Plane (32)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1895,7 +1836,7 @@ GameObject:
   - component: {fileID: 219305112}
   m_Layer: 0
   m_Name: Plane (50)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2001,7 +1942,7 @@ GameObject:
   - component: {fileID: 236731543}
   m_Layer: 0
   m_Name: Plane (37)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2213,7 +2154,7 @@ GameObject:
   - component: {fileID: 250860521}
   m_Layer: 0
   m_Name: Plane (4)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2446,7 +2387,7 @@ GameObject:
   - component: {fileID: 319717291}
   m_Layer: 0
   m_Name: Plane (20)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2552,7 +2493,7 @@ GameObject:
   - component: {fileID: 349388782}
   m_Layer: 0
   m_Name: Plane (25)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2644,6 +2585,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 349388780}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &361526457
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 361526458}
+  - component: {fileID: 361526459}
+  m_Layer: 0
+  m_Name: Thunder FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &361526458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361526457}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &361526459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361526457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &366619701
 GameObject:
   m_ObjectHideFlags: 0
@@ -3068,6 +3053,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 401964298}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &415087766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 415087767}
+  - component: {fileID: 415087768}
+  m_Layer: 0
+  m_Name: Particle FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &415087767
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415087766}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &415087768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 415087766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &424997503
 GameObject:
   m_ObjectHideFlags: 0
@@ -3225,7 +3254,7 @@ GameObject:
   - component: {fileID: 437235347}
   m_Layer: 0
   m_Name: Plane (18)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3520,7 +3549,7 @@ GameObject:
   - component: {fileID: 497425315}
   m_Layer: 0
   m_Name: Plane (21)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3612,6 +3641,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 497425313}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &498623333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 498623334}
+  - component: {fileID: 498623335}
+  m_Layer: 0
+  m_Name: Custom FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &498623334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 498623333}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &498623335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 498623333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &504397318
 GameObject:
   m_ObjectHideFlags: 0
@@ -3904,50 +3977,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &543650562
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 543650563}
-  - component: {fileID: 543650564}
-  m_Layer: 0
-  m_Name: Thunder FX
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &543650563
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543650562}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &543650564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 543650562}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &593940135
 GameObject:
   m_ObjectHideFlags: 0
@@ -3962,7 +3991,7 @@ GameObject:
   - component: {fileID: 593940137}
   m_Layer: 0
   m_Name: Plane (14)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4068,7 +4097,7 @@ GameObject:
   - component: {fileID: 600583023}
   m_Layer: 0
   m_Name: Plane (38)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4242,7 +4271,7 @@ GameObject:
   - component: {fileID: 676423340}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4348,7 +4377,7 @@ GameObject:
   - component: {fileID: 704110662}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4771,7 +4800,7 @@ GameObject:
   - component: {fileID: 782180132}
   m_Layer: 0
   m_Name: Plane (34)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4877,7 +4906,7 @@ GameObject:
   - component: {fileID: 784203589}
   m_Layer: 0
   m_Name: Plane (22)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4983,7 +5012,7 @@ GameObject:
   - component: {fileID: 791807046}
   m_Layer: 0
   m_Name: Plane (26)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5172,7 +5201,7 @@ GameObject:
   - component: {fileID: 804699246}
   m_Layer: 0
   m_Name: Plane (42)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5490,7 +5519,7 @@ GameObject:
   - component: {fileID: 851288617}
   m_Layer: 0
   m_Name: Cube (9)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5788,7 +5817,7 @@ GameObject:
   - component: {fileID: 913739481}
   m_Layer: 0
   m_Name: Plane (31)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5894,7 +5923,7 @@ GameObject:
   - component: {fileID: 937022820}
   m_Layer: 0
   m_Name: Plane (17)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6106,7 +6135,7 @@ GameObject:
   - component: {fileID: 950920885}
   m_Layer: 0
   m_Name: Plane (1)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6212,7 +6241,7 @@ GameObject:
   - component: {fileID: 969139687}
   m_Layer: 0
   m_Name: Plane (39)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6424,7 +6453,7 @@ GameObject:
   - component: {fileID: 1038200325}
   m_Layer: 0
   m_Name: Plane (24)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6833,7 +6862,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1062216789}
   m_LocalRotation: {x: 0.0000000037252899, y: -0, z: -0.0000000074505797, w: 1}
-  m_LocalPosition: {x: -4.16, y: 5.55, z: 27.160002}
+  m_LocalPosition: {x: -4.16, y: 4.98, z: 27.160002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7069,7 +7098,7 @@ GameObject:
   - component: {fileID: 1091069682}
   m_Layer: 0
   m_Name: Plane (33)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7408,7 +7437,7 @@ GameObject:
   - component: {fileID: 1111522161}
   m_Layer: 0
   m_Name: Plane (5)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7514,7 +7543,7 @@ GameObject:
   - component: {fileID: 1123183795}
   m_Layer: 0
   m_Name: Plane (43)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7620,7 +7649,7 @@ GameObject:
   - component: {fileID: 1157274513}
   m_Layer: 0
   m_Name: Plane (15)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7938,7 +7967,7 @@ GameObject:
   - component: {fileID: 1185244826}
   m_Layer: 0
   m_Name: Cube (6)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8043,7 +8072,7 @@ GameObject:
   - component: {fileID: 1206889401}
   m_Layer: 0
   m_Name: Plane (48)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8149,7 +8178,7 @@ GameObject:
   - component: {fileID: 1218164784}
   m_Layer: 0
   m_Name: Plane (44)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8361,7 +8390,7 @@ GameObject:
   - component: {fileID: 1249963775}
   m_Layer: 0
   m_Name: Plane (36)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8453,6 +8482,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1249963773}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1265731065
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1265731066}
+  - component: {fileID: 1265731067}
+  m_Layer: 0
+  m_Name: Audio FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1265731066
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265731065}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1265731067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265731065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1269010867
 GameObject:
   m_ObjectHideFlags: 0
@@ -8573,7 +8646,7 @@ GameObject:
   - component: {fileID: 1279486091}
   m_Layer: 0
   m_Name: Cube (7)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8678,7 +8751,7 @@ GameObject:
   - component: {fileID: 1303279064}
   m_Layer: 0
   m_Name: Plane (11)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8784,7 +8857,7 @@ GameObject:
   - component: {fileID: 1321888250}
   m_Layer: 0
   m_Name: Cube (8)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8889,7 +8962,7 @@ GameObject:
   - component: {fileID: 1333357606}
   m_Layer: 0
   m_Name: Plane (7)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9207,7 +9280,7 @@ GameObject:
   - component: {fileID: 1392778722}
   m_Layer: 0
   m_Name: Plane (6)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14193,7 +14266,7 @@ GameObject:
   - component: {fileID: 1464473353}
   m_Layer: 0
   m_Name: Plane (16)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14453,7 +14526,7 @@ GameObject:
   - component: {fileID: 1479051572}
   m_Layer: 0
   m_Name: Plane (10)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14559,7 +14632,7 @@ GameObject:
   - component: {fileID: 1479602338}
   m_Layer: 0
   m_Name: Cube (4)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14666,6 +14739,7 @@ GameObject:
   - component: {fileID: 1521499233}
   - component: {fileID: 1521499239}
   - component: {fileID: 1521499240}
+  - component: {fileID: 1521499241}
   m_Layer: 31
   m_Name: Player
   m_TagString: Player
@@ -14716,23 +14790,80 @@ MonoBehaviour:
   leanSpeed: 5
   footstepSource: {fileID: 1521499239}
   actionSource: {fileID: 1521499240}
-  turnSource: {fileID: 1521499239}
+  turnSource: {fileID: 1521499241}
   footstepSFXs:
-  - tag: 
+  - tag: Ground_Grass
     walkSounds:
-    - {fileID: 8300000, guid: cd63b0daa67ed774f998ac5fe75609b6, type: 3}
-    - {fileID: 8300000, guid: c01ce26b6a55c1e48a3e9887f38bff6a, type: 3}
+    - {fileID: 8300000, guid: 6fe0d98e877fe8a48bfe2e29f7a5f954, type: 3}
+    - {fileID: 8300000, guid: f69a92c9f73e4e2459a88a404684fcd6, type: 3}
+    - {fileID: 8300000, guid: a02dde66e65655c49967efb2f3777207, type: 3}
+    - {fileID: 8300000, guid: f9a8b7843138e844c8f743509351fabf, type: 3}
     runSounds:
-    - {fileID: 8300000, guid: cd63b0daa67ed774f998ac5fe75609b6, type: 3}
-    - {fileID: 8300000, guid: c01ce26b6a55c1e48a3e9887f38bff6a, type: 3}
-    jumpSounds: []
-    landSounds: []
-    turnSound: {fileID: 0}
-    walkPitchRange: {x: 0, y: 0}
-    runPitchRange: {x: 0, y: 0}
-    jumpPitchRange: {x: 0, y: 0}
-    landPitchRange: {x: 0, y: 0}
-    turnPitchRange: {x: 0, y: 0}
+    - {fileID: 8300000, guid: 6fe0d98e877fe8a48bfe2e29f7a5f954, type: 3}
+    - {fileID: 8300000, guid: f69a92c9f73e4e2459a88a404684fcd6, type: 3}
+    - {fileID: 8300000, guid: a02dde66e65655c49967efb2f3777207, type: 3}
+    - {fileID: 8300000, guid: f9a8b7843138e844c8f743509351fabf, type: 3}
+    jumpSounds:
+    - {fileID: 8300000, guid: 9282ee40e21ec3543b90426b5784af32, type: 3}
+    landSounds:
+    - {fileID: 8300000, guid: 2f0d65a9a0362524b959f35159f39179, type: 3}
+    turnSounds:
+    - {fileID: 8300000, guid: 51debd54561234545877277942d690aa, type: 3}
+    - {fileID: 8300000, guid: de18d8ccfe160f6408ebc70e444ef748, type: 3}
+    - {fileID: 8300000, guid: 34d0b809924fdd248b2950849cf1a969, type: 3}
+    - {fileID: 8300000, guid: 6ba4c6228ea15854695747cd4368fb16, type: 3}
+    - {fileID: 8300000, guid: f659d6072bb4a824cad5156fbd22e277, type: 3}
+    - {fileID: 8300000, guid: b1d78d589207d0d4cafa85326543615c, type: 3}
+    - {fileID: 8300000, guid: 990e44ece6a50e94191ca5397e6e08b2, type: 3}
+    - {fileID: 8300000, guid: 3c4aef4ad9366b040b5b1983b4a0da7a, type: 3}
+    - {fileID: 8300000, guid: be57c18090c90eb41b2e6f72c5130400, type: 3}
+    - {fileID: 8300000, guid: a89640cc45a540047a6f83a0951abf1f, type: 3}
+    - {fileID: 8300000, guid: f2697fad3b5a872429a333ee87b44d79, type: 3}
+    - {fileID: 8300000, guid: f88f6a95e9f1e8b4699e60e5c840b5cd, type: 3}
+    - {fileID: 8300000, guid: 3874d2ec413e3af489974ea31e222f57, type: 3}
+    - {fileID: 8300000, guid: c44cfb95357d96b48bf06e06db19f662, type: 3}
+    walkPitchRange: {x: 0.9, y: 1.1}
+    runPitchRange: {x: 0.85, y: 1}
+    jumpPitchRange: {x: 0.9, y: 1.1}
+    landPitchRange: {x: 0.9, y: 1.1}
+    turnPitchRange: {x: 0.9, y: 1.1}
+  - tag: Ground_Wood
+    walkSounds:
+    - {fileID: 8300000, guid: 0795f91cf22b8b242be44f7f79c11a2b, type: 3}
+    - {fileID: 8300000, guid: ce1c935f52dfb804db51d581b27a430e, type: 3}
+    - {fileID: 8300000, guid: 3d45b71611ce8ab4f9111ebbd402c9f7, type: 3}
+    - {fileID: 8300000, guid: 1fa770e5ef797e4449d0cc2da369f5b3, type: 3}
+    - {fileID: 8300000, guid: 148010614ffa04c4493bb97204bb8d69, type: 3}
+    runSounds:
+    - {fileID: 8300000, guid: 0795f91cf22b8b242be44f7f79c11a2b, type: 3}
+    - {fileID: 8300000, guid: ce1c935f52dfb804db51d581b27a430e, type: 3}
+    - {fileID: 8300000, guid: 3d45b71611ce8ab4f9111ebbd402c9f7, type: 3}
+    - {fileID: 8300000, guid: 1fa770e5ef797e4449d0cc2da369f5b3, type: 3}
+    - {fileID: 8300000, guid: 148010614ffa04c4493bb97204bb8d69, type: 3}
+    jumpSounds:
+    - {fileID: 8300000, guid: 9282ee40e21ec3543b90426b5784af32, type: 3}
+    landSounds:
+    - {fileID: 8300000, guid: 2f0d65a9a0362524b959f35159f39179, type: 3}
+    turnSounds:
+    - {fileID: 8300000, guid: 51debd54561234545877277942d690aa, type: 3}
+    - {fileID: 8300000, guid: de18d8ccfe160f6408ebc70e444ef748, type: 3}
+    - {fileID: 8300000, guid: 34d0b809924fdd248b2950849cf1a969, type: 3}
+    - {fileID: 8300000, guid: 6ba4c6228ea15854695747cd4368fb16, type: 3}
+    - {fileID: 8300000, guid: f659d6072bb4a824cad5156fbd22e277, type: 3}
+    - {fileID: 8300000, guid: b1d78d589207d0d4cafa85326543615c, type: 3}
+    - {fileID: 8300000, guid: 990e44ece6a50e94191ca5397e6e08b2, type: 3}
+    - {fileID: 8300000, guid: 3c4aef4ad9366b040b5b1983b4a0da7a, type: 3}
+    - {fileID: 8300000, guid: be57c18090c90eb41b2e6f72c5130400, type: 3}
+    - {fileID: 8300000, guid: a89640cc45a540047a6f83a0951abf1f, type: 3}
+    - {fileID: 8300000, guid: f2697fad3b5a872429a333ee87b44d79, type: 3}
+    - {fileID: 8300000, guid: f88f6a95e9f1e8b4699e60e5c840b5cd, type: 3}
+    - {fileID: 8300000, guid: 3874d2ec413e3af489974ea31e222f57, type: 3}
+    - {fileID: 8300000, guid: c44cfb95357d96b48bf06e06db19f662, type: 3}
+    walkPitchRange: {x: 0.9, y: 1.1}
+    runPitchRange: {x: 0.85, y: 1}
+    jumpPitchRange: {x: 0.9, y: 1.1}
+    landPitchRange: {x: 0.9, y: 1.1}
+    turnPitchRange: {x: 0.9, y: 1.1}
   jumpSound: {fileID: 8300000, guid: 9282ee40e21ec3543b90426b5784af32, type: 3}
   landSound: {fileID: 8300000, guid: 2f0d65a9a0362524b959f35159f39179, type: 3}
   boostSoundW:
@@ -14749,7 +14880,7 @@ MonoBehaviour:
     pitchRange: {x: 0.7, y: 1.1}
   walkFootstepInterval: 0.5
   runFootstepInterval: 0.3
-  turnCooldown: 0.5
+  turnCooldown: 1.25
   walkPitchRange: {x: 0.9, y: 1.1}
   runJumpPitchRange: {x: 0.85, y: 1}
   maxStamina: 100
@@ -14868,7 +14999,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521499231}
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: -4.25, y: 4.54, z: 27.17}
+  m_LocalPosition: {x: -4.25, y: 3.97, z: 27.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14984,7 +15115,103 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &1521499241
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521499231}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -15175,50 +15402,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521860377}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1524288477
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1524288478}
-  - component: {fileID: 1524288479}
-  m_Layer: 0
-  m_Name: Particle FX
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1524288478
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524288477}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1524288479
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524288477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1525509484
 GameObject:
   m_ObjectHideFlags: 0
@@ -15233,7 +15416,7 @@ GameObject:
   - component: {fileID: 1525509486}
   m_Layer: 0
   m_Name: Plane (13)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15445,7 +15628,7 @@ GameObject:
   - component: {fileID: 1535706438}
   m_Layer: 0
   m_Name: Plane (19)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15857,13 +16040,13 @@ MonoBehaviour:
   parent: {fileID: 0}
   hideFXInHierarchy: 1
   particleManager:
-    parent: {fileID: 1524288478}
+    parent: {fileID: 415087767}
     _IsEnabled: 1
     _OpenTab: 0
     vfx: {fileID: 1558305241}
     multiplier: 1
   thunderManager:
-    parent: {fileID: 543650563}
+    parent: {fileID: 361526458}
     _IsEnabled: 1
     _OpenTab: 0
     vfx: {fileID: 1558305241}
@@ -15881,14 +16064,14 @@ MonoBehaviour:
     _OpenTab: 0
     vfx: {fileID: 1558305241}
   audioManager:
-    parent: {fileID: 1855275772}
+    parent: {fileID: 1265731066}
     _IsEnabled: 1
     _OpenTab: 1
     vfx: {fileID: 1558305241}
     volumeMultiplier: 0
     weatherFXMixer: {fileID: 6122681528400141310, guid: 7657aaa11fc9748449b9a88b6a5dc9ca, type: 2}
   postFXManager:
-    parent: {fileID: 2034708784}
+    parent: {fileID: 158374692}
     _IsEnabled: 1
     _OpenTab: 0
     vfx: {fileID: 1558305241}
@@ -15904,14 +16087,14 @@ MonoBehaviour:
     _IsEnabled: 1
     _OpenTab: 0
     vfx: {fileID: 1558305241}
-    windZone: {fileID: 186526521}
+    windZone: {fileID: 1947149945}
     windMultiplier: 1
     useWindzone: 1
     generateWindzoneAtRuntime: 1
     useShaderWind: 1
     windFXes: []
   customFXModule:
-    parent: {fileID: 83445948}
+    parent: {fileID: 498623334}
     _IsEnabled: 1
     _OpenTab: 0
     vfx: {fileID: 1558305241}
@@ -15950,7 +16133,7 @@ GameObject:
   - component: {fileID: 1561901851}
   m_Layer: 0
   m_Name: Plane (12)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16372,7 +16555,7 @@ GameObject:
   - component: {fileID: 1615262006}
   m_Layer: 0
   m_Name: Plane (30)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16478,7 +16661,7 @@ GameObject:
   - component: {fileID: 1660630060}
   m_Layer: 0
   m_Name: Plane (29)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22037,7 +22220,7 @@ GameObject:
   - component: {fileID: 1745198002}
   m_Layer: 0
   m_Name: Plane (40)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22355,7 +22538,7 @@ GameObject:
   - component: {fileID: 1772030296}
   m_Layer: 0
   m_Name: Plane (9)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22567,7 +22750,7 @@ GameObject:
   - component: {fileID: 1782486108}
   m_Layer: 0
   m_Name: Cube (3)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22778,7 +22961,7 @@ GameObject:
   - component: {fileID: 1816843911}
   m_Layer: 0
   m_Name: Plane (35)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22990,7 +23173,7 @@ GameObject:
   - component: {fileID: 1838612718}
   m_Layer: 0
   m_Name: Plane (46)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23234,50 +23417,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1851468465}
   m_CullTransparentMesh: 1
---- !u!1 &1855275771
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1855275772}
-  - component: {fileID: 1855275773}
-  m_Layer: 0
-  m_Name: Audio FX
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1855275772
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1855275771}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1855275773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1855275771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1856013954
 GameObject:
   m_ObjectHideFlags: 0
@@ -23292,7 +23431,7 @@ GameObject:
   - component: {fileID: 1856013956}
   m_Layer: 0
   m_Name: Plane (49)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23504,7 +23643,7 @@ GameObject:
   - component: {fileID: 1908913937}
   m_Layer: 0
   m_Name: Plane (8)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23716,7 +23855,7 @@ GameObject:
   - component: {fileID: 1916689627}
   m_Layer: 0
   m_Name: Plane (47)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23822,7 +23961,7 @@ GameObject:
   - component: {fileID: 1921701620}
   m_Layer: 0
   m_Name: Cube (10)
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -23913,6 +24052,65 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1921701618}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1947149944
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1947149947}
+  - component: {fileID: 1947149946}
+  - component: {fileID: 1947149945}
+  m_Layer: 0
+  m_Name: Wind Zone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &1947149945
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947149944}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.5
+  m_WindTurbulence: 1
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.01
+--- !u!114 &1947149946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947149944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1947149947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947149944}
+  m_LocalRotation: {x: -0, y: 0.99999654, z: -0, w: -0.0026431165}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1990045738
 GameObject:
   m_ObjectHideFlags: 0
@@ -23927,7 +24125,7 @@ GameObject:
   - component: {fileID: 1990045740}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Objects
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24032,7 +24230,7 @@ GameObject:
   - component: {fileID: 2000182154}
   m_Layer: 0
   m_Name: Plane (51)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24276,7 +24474,7 @@ GameObject:
   - component: {fileID: 2016052518}
   m_Layer: 0
   m_Name: Plane (27)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24368,50 +24566,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2016052516}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &2034708783
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2034708784}
-  - component: {fileID: 2034708785}
-  m_Layer: 0
-  m_Name: Post FX
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2034708784
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2034708783}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2034708785
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2034708783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cec496125454a684bb93d5662d04938e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2046255585
 GameObject:
   m_ObjectHideFlags: 0
@@ -24426,7 +24580,7 @@ GameObject:
   - component: {fileID: 2046255587}
   m_Layer: 0
   m_Name: Plane (2)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24532,7 +24686,7 @@ GameObject:
   - component: {fileID: 2049485954}
   m_Layer: 0
   m_Name: Plane (28)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24820,7 +24974,7 @@ GameObject:
   - component: {fileID: 2075553597}
   m_Layer: 0
   m_Name: Plane (23)
-  m_TagString: Ground
+  m_TagString: Ground_Grass
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29955,7 +30109,7 @@ GameObject:
   - component: {fileID: 2110396145}
   m_Layer: 0
   m_Name: Plane (41)
-  m_TagString: Ground
+  m_TagString: Ground_Wood
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
