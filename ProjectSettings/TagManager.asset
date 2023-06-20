@@ -9,6 +9,7 @@ TagManager:
   - Objects
   - Ground_Grass
   - Ground_Wood
+  - Ground_Cement
   layers:
   - Default
   - TransparentFX

@@ -69,6 +69,8 @@ public class PlayerController : MonoBehaviour
     private Dictionary<KeyCode, float> boostForces;
     [SerializeField]
     private float boostCooldown = 3f;
+    private bool boostEnabled;
+    public bool isBoostEnabled = true;
 
     // Camera Bobbing
     [Header("Camera Bobbing")]
@@ -150,6 +152,8 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("Dictionary mapping key codes to their associated boost sounds")]
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
+
+    public BoostSound boostSound;
 
 
     // Footstep Interval
@@ -275,6 +279,12 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currentBoost = maxBoost;
+
+        // Assign boost sounds to respective keys
+        boostSounds.Add(KeyCode.W, boostSoundW);
+        boostSounds.Add(KeyCode.A, boostSoundA);
+        boostSounds.Add(KeyCode.S, boostSoundS);
+        boostSounds.Add(KeyCode.D, boostSoundD);
     }
 
     private void InitializePlayer()
@@ -422,6 +432,19 @@ public class PlayerController : MonoBehaviour
             velocity.y += gravity * Time.deltaTime;
         }
         controller.Move(velocity * Time.deltaTime);
+
+        // Check if boost is enabled and if the boost key is pressed
+        if (isBoostEnabled)
+        {
+            foreach (KeyValuePair<KeyCode, float> boostForce in boostForces)
+            {
+                if (Input.GetKeyDown(boostForce.Key))
+                {
+                    StartCoroutine(Boost(boostForce.Key));
+                    break;
+                }
+            }
+        }
     }
 
     bool IsPlayerGrounded()
@@ -707,6 +730,23 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Boost(KeyCode key)
     {
+        if (!boostEnabled)
+        {
+            yield break;  // Stop the execution of the coroutine
+        }
+
+        BoostSound boostSound;
+        if (!boostSounds.TryGetValue(key, out boostSound))
+        {
+            Debug.LogError("No boost sound associated with this key.");
+            yield break;
+        }
+
+        // Now you can use boostSound.clip as the sound clip to play
+        actionSource.clip = boostSound.clip;
+        actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
+        actionSource.Play();
+
         isBoosting = true;
         float boostTimer = 0.5f;  // Adjust this value to control the duration of the boost
 
@@ -723,13 +763,24 @@ public class PlayerController : MonoBehaviour
         velocity = new Vector3(0, velocity.y, 0);  // Reset horizontal velocity
         isFallingAfterBoost = true;  // Set this flag to true after the boost
     }
+    private void PlayBoostSound()
+    {
+        // Only play the sound if boost is enabled
+        if (isBoostEnabled)
+        {
+            AudioSource audioSource = GetComponent<AudioSource>();
+            audioSource.clip = boostSound.clip;
+            audioSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
+            audioSource.Play();
+        }
+    }
 
-    [System.Serializable]
     public class BoostSound
     {
         public AudioClip clip;
-        public Vector2 pitchRange = new Vector2(0.9f, 1.1f);
+        public Vector2 pitchRange;
     }
+
 
     private void ProcessFootsteps()
     {
