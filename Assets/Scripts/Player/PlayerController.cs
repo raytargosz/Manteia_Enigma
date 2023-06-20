@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     private float originalGravity;
     private bool rightFootNext = true;
+    private bool isClimbing = false;
+    public float climbSpeed = 3f;
 
     // Jump Settings
     [SerializeField, Tooltip("Max time the jump button can be held")]
@@ -269,6 +271,22 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            isClimbing = true;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            isClimbing = false;
+        }
     }
 
     void Start()
@@ -544,53 +562,72 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessPlayerMovement()
     {
-        float moveSpeed;
-
-        // Only allow running if stamina is not exhausted
-        if ((currentStamina > 0 || !Input.GetKey(KeyCode.LeftShift)) && canRun)
+        if (isClimbing)
         {
-            moveSpeed = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? runSpeed : walkSpeed;
-            currentState = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? PlayerState.Running : PlayerState.Walking;
+            ClimbLadder();
         }
         else
         {
-            moveSpeed = walkSpeed;
-            currentState = PlayerState.Walking;
-        }
+            float moveSpeed;
 
-        // Change the state to Idle if there's no movement
-        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
-
-        isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
-
-        Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
-        controller.Move(move * moveSpeed * Time.deltaTime);
-
-        // Store the move direction for use in boosting
-        if (move != Vector3.zero)
-        {
-            boostDirection = move.normalized;
-        }
-
-        // Lean effect
-        if (isRunning || isBoosting) // Apply lean only when running or boosting
-        {
-            float targetLeanAngle = 0f;
-            if (move != Vector3.zero)  // If player is moving
+            // Only allow running if stamina is not exhausted
+            if ((currentStamina > 0 || !Input.GetKey(KeyCode.LeftShift)) && canRun)
             {
-                if (Input.GetAxis("Horizontal") > 0)  // Moving right
-                {
-                    targetLeanAngle = -maxLeanAngle;
-                }
-                else if (Input.GetAxis("Horizontal") < 0)  // Moving left
-                {
-                    targetLeanAngle = maxLeanAngle;
-                }
+                moveSpeed = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? runSpeed : walkSpeed;
+                currentState = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? PlayerState.Running : PlayerState.Walking;
             }
-            float currentLeanAngle = playerCamera.transform.localEulerAngles.z;
-            float newLeanAngle = Mathf.LerpAngle(currentLeanAngle, targetLeanAngle, leanSpeed * Time.deltaTime);
-            playerCamera.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, playerCamera.transform.localEulerAngles.y, newLeanAngle);
+            else
+            {
+                moveSpeed = walkSpeed;
+                currentState = PlayerState.Walking;
+            }
+
+            // Change the state to Idle if there's no movement
+            if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
+
+            isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
+
+            Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
+            controller.Move(move * moveSpeed * Time.deltaTime);
+
+            // Store the move direction for use in boosting
+            if (move != Vector3.zero)
+            {
+                boostDirection = move.normalized;
+            }
+
+            // Lean effect
+            if (isRunning || isBoosting) // Apply lean only when running or boosting
+            {
+                float targetLeanAngle = 0f;
+                if (move != Vector3.zero)  // If player is moving
+                {
+                    if (Input.GetAxis("Horizontal") > 0)  // Moving right
+                    {
+                        targetLeanAngle = -maxLeanAngle;
+                    }
+                    else if (Input.GetAxis("Horizontal") < 0)  // Moving left
+                    {
+                        targetLeanAngle = maxLeanAngle;
+                    }
+                }
+                float currentLeanAngle = playerCamera.transform.localEulerAngles.z;
+                float newLeanAngle = Mathf.LerpAngle(currentLeanAngle, targetLeanAngle, leanSpeed * Time.deltaTime);
+                playerCamera.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, playerCamera.transform.localEulerAngles.y, newLeanAngle);
+            }
         }
+    }
+    private void ClimbLadder()
+    {
+        Vector3 up = transform.up;
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        float verticalInput = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxis("Horizontal");
+
+        Vector3 climbDirection = (up * verticalInput + right * horizontalInput + forward * verticalInput).normalized;
+        controller.Move(climbDirection * climbSpeed * Time.deltaTime);
     }
 
     private void ProcessPlayerFOV()
