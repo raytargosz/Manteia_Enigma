@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Stylized Clouds
-  m_Shader: {fileID: 4800000, guid: 1a6791d1617850b49b130b523f5ebf5c, type: 3}
+  m_Shader: {fileID: 4800000, guid: 5bab19359d4a7d14b91a3b2fa6ae3b8b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -220,7 +220,7 @@ Material:
     - _SecondLayer: {r: 0.9056604, g: 0.9056604, b: 0.9056604, a: 0}
     - _SecondLayer1: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 0}
     - _ShadowDirection: {r: 0, g: 0, b: 0, a: 0}
-    - _StormDirection: {r: 0.3245636, g: -0, b: 0.9458639, a: 0}
+    - _StormDirection: {r: 0.91435397, g: -0, b: 0.40491584, a: 0}
     - _SunDirection: {r: 0.021961212, g: 0.9569714, b: 0.28935018, a: 0}
     - _SunDirection1: {r: 0, g: 0, b: 0, a: 0}
     - _TexturePanDirection: {r: 0.1, g: 1, b: 0.1, a: 0}
