@@ -17,15 +17,20 @@ public class PlayerController : MonoBehaviour
     // Player Movement Settings
     [Header("Movement")]
     [SerializeField, Tooltip("Normal speed of the player")]
-    private float walkSpeed = 3f;
+    public float walkSpeed = 3f;
     [SerializeField, Tooltip("Running speed of the player")]
-    private float runSpeed = 6f;
+    public float runSpeed = 6f;
     [SerializeField, Tooltip("Jump force for the regular jump")]
-    private float jumpForce = 2f;
+    public float jumpForce = 2f;
+    [SerializeField, Tooltip("Height of the jump")]
     public float jumpHeight = 2.0f;
+    [SerializeField, Tooltip("Player's moving speed")]
     public float moveSpeed = 5f;
-    [Tooltip("The speed at which the player falls after a jump")]
+    [SerializeField, Tooltip("The speed at which the player falls after a jump")]
     public float fallSpeed = 2.5f;
+    [SerializeField, Tooltip("Climbing speed of the player")]
+    public float climbSpeed = 3f;
+
     private bool isJumping = false;
     private bool isFalling = false;
     private bool hasJumped = false;
@@ -38,12 +43,21 @@ public class PlayerController : MonoBehaviour
     private float originalGravity;
     private bool rightFootNext = true;
     private bool isClimbing = false;
-    public float climbSpeed = 3f;
+    private bool jumpQueued = false;
 
     // Jump Settings
+    [Header("Jump")]
     [SerializeField, Tooltip("Max time the jump button can be held")]
-    private float jumpTime = 0.35f;
+    public float jumpTime = 0.35f;
     private float jumpTimeCounter;
+    [SerializeField, Tooltip("Allow holding the button for continuous jumping")]
+    public bool holdToJump = false;
+    private bool isJumpButtonHeld = false;
+    private bool wasJumpingLastFrame = false;
+    [SerializeField, Tooltip("Jump force while running")]
+    public float runJumpForce = 8.0f;
+    [SerializeField, Tooltip("Jump force while walking")]
+    public float walkJumpForce = 5.0f;
 
     // Boost Settings
     [Header("Boost Variables")]
@@ -386,15 +400,37 @@ public class PlayerController : MonoBehaviour
 
         // Handle horizontal movement
 
-        if (Input.GetButtonDown("Jump") && !isJumping)
+        isGrounded = IsPlayerGrounded();
+
+        // If the jump button is pressed...
+        if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) // Note the addition here
         {
-            Jump();
+            isJumpButtonHeld = true;
+            // If the player is not currently jumping (in the air), then jump
+            if (!isJumping)
+            {
+                Jump(true);
+            }
         }
+        // If the jump button is released...
+        if (Input.GetButtonUp("Jump") || Input.GetMouseButtonUp(0)) // Note the addition here
+        {
+            isJumpButtonHeld = false;
+        }
+        // Check for jump input
+        if ((Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) && canJump) // Note the addition here
+        {
+            jumpQueued = true;
+        }
+
+        wasJumpingLastFrame = isJumping;
 
         if (isFalling)
         {
             Fall();
         }
+
+        wasJumpingLastFrame = isJumping;
 
         // Handle boost
         if (currentState == PlayerState.Boosting && currentBoost >= 0)
@@ -467,7 +503,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    bool IsPlayerGrounded()
+    void FixedUpdate()
+    {
+        // If the player is grounded and a jump is queued, make the player jump
+        if (isGrounded && jumpQueued)
+        {
+            Jump(false); // Assuming this is the correct Jump call
+            jumpQueued = false; // Reset the flag since we've acted on the jump
+        }
+    }
+
+        bool IsPlayerGrounded()
     {
         // The length of the ray
         float distanceToGround = 0.1f;
@@ -485,26 +531,41 @@ public class PlayerController : MonoBehaviour
 
         return false;
     }
-    private void Jump()
+
+    private void Jump(bool isFirstJump)
     {
-        // Assuming you're using a Rigidbody or CharacterController for movement
-        // Add force or change velocity for a jump
-        velocity.y = jumpForce;
+        // Check if player is running or walking to adjust the jump force
+        float currentJumpForce = (currentState == PlayerState.Running) ? runJumpForce : walkJumpForce;
+
+        // If it's the first jump and the jump button is being held, increase the jump force
+        if (isFirstJump && isJumpButtonHeld)
+        {
+            currentJumpForce *= 1.5f;
+        }
+
+        // Assuming you're using a CharacterController for movement
+        // Modify the y component of velocity for a jump
+        velocity.y = Mathf.Sqrt(currentJumpForce * -2f * gravity);
         isJumping = true;
     }
 
     private void Fall()
     {
         // Decrease the y velocity to simulate a fall
-        // This would be done differently depending on whether you're using a Rigidbody or CharacterController
+        // If the player lets go of the jump button mid-air, cut their upward speed short
+        if (!isJumpButtonHeld && velocity.y > 0)
+        {
+            velocity.y *= 0.5f;
+        }
+
+        velocity.y += gravity * Time.deltaTime;
         isJumping = false;
         isFalling = true;
-        velocity.y -= fallSpeed * Time.deltaTime;
     }
 
     private void ProcessPlayerJumpAndBoost()
     {
-        if (isGrounded && Input.GetButtonDown("Jump") && canJump)
+        if (isGrounded && Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0) && canJump)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             hasJumped = true; // Set hasJumped to true after a jump
@@ -690,7 +751,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0))
         {
             if (isGrounded)
             {
@@ -746,7 +807,7 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessJump()
     {
-        if (isGrounded && Input.GetButtonDown("Jump") && canJump)
+        if (isGrounded && Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0) && canJump)
         {
             isJumping = true;
             jumpTimeCounter = jumpTime;
