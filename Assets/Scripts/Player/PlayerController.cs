@@ -273,11 +273,12 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
+    void OnTriggerEnter(Collider other)
     {
-        if (hit.gameObject.CompareTag("Ladder"))
+        if (other.gameObject.CompareTag("Ladder"))
         {
             isClimbing = true;
+            Debug.Log("Entered ladder");
         }
     }
 
@@ -286,6 +287,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Ladder"))
         {
             isClimbing = false;
+            Debug.Log("Exited ladder");
         }
     }
 
@@ -562,21 +564,23 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessPlayerMovement()
     {
-        if (isClimbing && Input.GetAxis("Vertical") != 0)
+        if (isClimbing)
         {
-            // Player is climbing
             Vector3 up = playerCamera.transform.up;
             Vector3 forward = playerCamera.transform.forward;
             Vector3 right = playerCamera.transform.right;
-            Vector3 moveDirection = (up * Input.GetAxis("Vertical") + right * Input.GetAxis("Horizontal")).normalized;
 
-            if (Vector3.Dot(moveDirection, forward) > 0.5f)  // Player is looking upwards
+            Vector3 moveDirection = (Input.GetAxis("Vertical") * up + Input.GetAxis("Horizontal") * right).normalized;
+
+            Debug.Log($"Move Direction: {moveDirection}");
+
+            if (Input.GetAxis("Vertical") != 0)
             {
-                controller.Move(moveDirection * climbSpeed * Time.deltaTime);
-            }
-            else if (Vector3.Dot(moveDirection, -forward) > 0.5f)  // Player is looking downwards
-            {
-                controller.Move(-moveDirection * climbSpeed * Time.deltaTime);
+                if (Vector3.Dot(moveDirection, forward) > 0.5f || Vector3.Dot(moveDirection, -forward) > 0.5f)
+                {
+                    Debug.Log($"Climbing with speed: {climbSpeed}");
+                    controller.Move(moveDirection * climbSpeed * Time.deltaTime);
+                }
             }
         }
         else
