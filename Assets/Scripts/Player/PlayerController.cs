@@ -738,6 +738,7 @@ public class PlayerController : MonoBehaviour
         // Debug statement:
         Debug.Log("ProcessMouseLook called. Mouse X: " + mouseLookX + ", Mouse Y: " + mouseLookY);
     }
+
     private void ProcessJumpInput()
     {
         KeyCode boostKey = KeyCode.None;
@@ -751,39 +752,33 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0))
+        if ((Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) && isGrounded && canJump)
         {
-            if (isGrounded)
+            velocity.y = Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
+            canBoost = true;
+            hasJumped = true;
+            actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
+            actionSource.PlayOneShot(jumpSound);
+
+            // Decrease stamina for the jump
+            currentStamina -= staminaJumpCost;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+            // If stamina is zero, disallow running
+            if (currentStamina <= 0)
             {
-                if (canJump) // Check if the player has enough stamina to jump
-                {
-                    velocity.y += Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
-                    canBoost = true;
-                    hasJumped = true;
-                    actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-                    actionSource.PlayOneShot(jumpSound);
-
-                    // Decrease stamina for the jump
-                    currentStamina -= staminaJumpCost;
-                    currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-
-                    // If stamina is zero, disallow running
-                    if (currentStamina <= 0)
-                    {
-                        canRun = false;
-                    }
-                }
+                canRun = false;
             }
-            else if (canBoost && !isGrounded && boostKey != KeyCode.None)
-            {
-                canBoost = false;
+        }
+        else if ((Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) && canBoost && !isGrounded && boostKey != KeyCode.None)
+        {
+            canBoost = false;
 
-                BoostSound boostSound = boostSounds[boostKey];
-                actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
-                actionSource.PlayOneShot(boostSound.clip);
+            BoostSound boostSound = boostSounds[boostKey];
+            actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
+            actionSource.PlayOneShot(boostSound.clip);
 
-                StartCoroutine(Boost(boostKey));
-            }
+            StartCoroutine(Boost(boostKey));
         }
 
         if (isFallingAfterBoost)  // Only apply increased gravity when falling after boost
@@ -795,7 +790,7 @@ public class PlayerController : MonoBehaviour
             velocity.y += Physics.gravity.y * Time.deltaTime;
         }
 
-        // reset gravity when grounded and set the flag isFallingAfterBoost to false
+        // Reset gravity when grounded and set the flag isFallingAfterBoost to false
         if (isGrounded)
         {
             Physics.gravity = new Vector3(0, originalGravity, 0);
