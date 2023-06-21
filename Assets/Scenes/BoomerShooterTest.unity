@@ -58712,7 +58712,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1772205358}
-  m_LocalRotation: {x: -0, y: -0.100677885, z: -0, w: 0.9949191}
+  m_LocalRotation: {x: -0, y: -0.10003294, z: -0, w: 0.99498415}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -62800,7 +62800,7 @@ MonoBehaviour:
     loop: 0
     mute: 0
     reverbIntensity: 1
-    volume: 0.2
+    volume: 0.33
     pitch: 1
     spatialBlend: 0
     reverbDecayTime: 0.33
