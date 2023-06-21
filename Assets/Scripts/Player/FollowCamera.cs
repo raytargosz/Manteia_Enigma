@@ -9,14 +9,17 @@ public class FollowCamera : MonoBehaviour
     private Vector3 offsetPosition;
     [SerializeField, Tooltip("Offset rotation")]
     private Vector3 offsetRotation;
+    [SerializeField, Tooltip("Speed of the camera's transition")]
+    private float transitionSpeed = 5f;
 
-    private void Update()
+    private void LateUpdate()
     {
         // Apply position and rotation offset
         Vector3 targetPosition = playerTransform.position + offsetPosition;
-        transform.position = targetPosition;
+        transform.position = Vector3.Lerp(transform.position, targetPosition, transitionSpeed * Time.deltaTime);
 
         // Apply rotation offset (consider using Quaternion.Lerp or Slerp for smoother rotation)
-        transform.rotation = Quaternion.Euler(offsetRotation);
+        Quaternion targetRotation = Quaternion.Euler(offsetRotation);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, transitionSpeed * Time.deltaTime);
     }
 }
