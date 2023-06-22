@@ -8,12 +8,10 @@ public class PlayerController : MonoBehaviour
 {
     // Character Controller
     private CharacterController controller;
-
     // Camera Settings
     private Camera playerCamera;
     private float defaultCameraYPos;
     private float bobbingCounter = 0f;
-
     // Player Movement Settings
     [Header("Movement")]
     public float speed = 5.0f;
@@ -36,6 +34,7 @@ public class PlayerController : MonoBehaviour
     private bool isFalling = false;
     private bool hasJumped = false;
     private bool isGrounded;
+    private float landingTimer;
     private bool wasGrounded;
     private bool isRunning = false;
     private bool canRun = true;
@@ -45,7 +44,6 @@ public class PlayerController : MonoBehaviour
     private bool rightFootNext = true;
     private bool isClimbing = false;
     private bool jumpQueued = false;
-
 
     // Jump Settings
     [Header("Jump")]
@@ -60,11 +58,12 @@ public class PlayerController : MonoBehaviour
     public float runJumpForce = 8.0f;
     [SerializeField, Tooltip("Jump force while walking")]
     public float walkJumpForce = 5.0f;
+    public float fallThreshold = 10f; // Define the fall threshold value here
+    public float landingTime = 0.1f; // Adjust the landing time value as needed
     // You need to set these in the Inspector in Unity:
     public Transform groundCheck; // Drag and drop the transform that represents the 'feet' of your character.
     public float groundCheckRadius = 0.2f; // Adjust to fit your needs
     public LayerMask groundMask; // Assign the relevant layer(s) in the Inspector.
-
     // Boost Settings
     [Header("Boost Variables")]
     [SerializeField, Tooltip("Gravity multiplier after boosting")]
@@ -93,7 +92,6 @@ public class PlayerController : MonoBehaviour
     private float boostCooldown = 3f;
     private bool boostEnabled;
     public bool isBoostEnabled = true;
-
     // Camera Bobbing
     [Header("Camera Bobbing")]
     [SerializeField, Tooltip("Bobbing speed when idle")]
@@ -112,13 +110,11 @@ public class PlayerController : MonoBehaviour
     private float boostBobbingSpeed = 1.5f;
     [SerializeField]
     private float boostBobbingAmount = 0.2f;
-
     // Mouse Look
     [Header("Mouse Look")]
     [SerializeField, Tooltip("Mouse sensitivity")]
     private float mouseSensitivity = 100f;
     public float mouseSmoothness = 5f;
-
     // Field of View
     [Header("Field of View")]
     [SerializeField, Tooltip("Default Field of View")]
@@ -129,7 +125,6 @@ public class PlayerController : MonoBehaviour
     private float boostFOV = 90f;
     [SerializeField, Tooltip("Transition speed between FOVs")]
     private float fovTransitionSpeed = 5f;
-
     // Lean Effect
     [Header("Lean Effect")]
     [SerializeField, Tooltip("Max lean angle in degrees")]
@@ -177,8 +172,6 @@ public class PlayerController : MonoBehaviour
     private Dictionary<KeyCode, BoostSound> boostSounds = new Dictionary<KeyCode, BoostSound>();
 
     public BoostSound boostSound;
-
-
     // Footstep Interval
     [Header("Footstep Interval")]
     [SerializeField, Tooltip("Interval for footstep sounds when walking")]
@@ -187,14 +180,12 @@ public class PlayerController : MonoBehaviour
     private float runFootstepInterval = 0.3f;
     public float turnCooldown = 0.5f;
     private float lastTurnTime = 0f;
-
     // Sound Pitch Variation
     [Header("Sound Pitch Variation")]
     [SerializeField, Tooltip("Min and max pitch for walking footsteps")]
     private Vector2 walkPitchRange = new Vector2(0.9f, 1.1f);
     [SerializeField, Tooltip("Min and max pitch for running and jumping")]
     private Vector2 runJumpPitchRange = new Vector2(0.8f, 1.2f);
-
     // Player Stats
     [Header("Player Stats")]
     [SerializeField, Tooltip("Max stamina")]
@@ -216,11 +207,9 @@ public class PlayerController : MonoBehaviour
     private float staminaRegenSpeed = 20f; // Stamina regenerated per second when not running
     [SerializeField, Tooltip("Boost regeneration rate")]
     private float boostRegenSpeed = 10f; // Boost regenerated per second when not boosting
-
     // Player UI
     [SerializeField]
     private PlayerUIController playerUIController;
-
     // Sound SFX Structure
     // This structure is used to organize the various audio clips and their pitch variations 
     // for different player actions and surface interactions.
@@ -263,7 +252,6 @@ public class PlayerController : MonoBehaviour
         [Tooltip("Range of possible pitch adjustments for turn sounds (to add variety)")]
         public Vector2 turnPitchRange;
     }
-
     // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
     public enum PlayerState
@@ -274,29 +262,23 @@ public class PlayerController : MonoBehaviour
         Jumping,
         Boosting,
     }
-
     public PlayerState GetCurrentState()
     {
         return currentState;
     }
-
     private float yRotation = 0f;
     private float xRotation = 0f;
     private float footstepCounter = 0f;
-
     // Public getters for current health, stamina, and boost
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
     public float CurrentBoost => currentBoost;
 
 
-
-
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
     }
-
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Ladder"))
@@ -305,7 +287,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Entered ladder");
         }
     }
-
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Ladder"))
@@ -314,7 +295,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Exited ladder");
         }
     }
-
     void Start()
     {
         InitializePlayer();
@@ -330,7 +310,6 @@ public class PlayerController : MonoBehaviour
         boostSounds.Add(KeyCode.S, boostSoundS);
         boostSounds.Add(KeyCode.D, boostSoundD);
     }
-
     private void InitializePlayer()
     {
         controller = GetComponent<CharacterController>();
@@ -347,7 +326,6 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
     private void InitializeSoundAndForces()
     {
         isGrounded = controller.isGrounded;
@@ -360,19 +338,10 @@ public class PlayerController : MonoBehaviour
         {KeyCode.D, boostSoundD}
     };
     }
-
     void Update()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        // Check for movement input
-        if (move != Vector3.zero)
-        {
-            controller.SimpleMove(move * speed);
-        }
+        // Check for ground state
+        ProcessGroundState();
 
         // Process the new jump function
         ProcessJump();
@@ -396,19 +365,16 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Ground check
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
-
-        if (isFalling && isGrounded)
-        {
-            Fall();
-            isFalling = false;
-        }
-
         // Apply gravity
-        if (!isGrounded && !isJumping)
+        if (!isGrounded)
         {
             velocity.y += gravity * Time.fixedDeltaTime;
+        }
+        else if (isFalling)
+        {
+            // Check if the player was falling
+            Fall();
+            isFalling = false;
         }
 
         controller.Move(velocity * Time.fixedDeltaTime);
@@ -416,134 +382,78 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessJump()
     {
-        if (controller.isGrounded)
+        if (isGrounded)
         {
-            velocity.y = 0f;
-            isJumping = false;
+            velocity.y = 0f; // Reset vertical velocity while grounded
 
-            if (Input.GetButtonDown("Jump") && !isJumping)
+            if (Input.GetButtonDown("Jump") && !wasJumpingLastFrame)
             {
-                // Jump code
-                float currentJumpForce = (currentState == PlayerState.Running) ? runJumpForce : walkJumpForce;
-                velocity.y = Mathf.Sqrt(currentJumpForce * -2f * gravity);
-                hasJumped = true;
-
-                // Play the jump sound
-                actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-                actionSource.PlayOneShot(jumpSound);
-
-                // Decrease stamina for the jump
-                currentStamina -= staminaJumpCost;
-                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-
-                // If stamina is zero, disallow running
-                if (currentStamina <= 0)
-                {
-                    canRun = false;
-                }
-
+                velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
                 isJumping = true;
-                jumpTimeCounter = jumpTime;
-
-                // Play footstep sound effect
-                SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
-                footstepSource.pitch = Random.Range(sfx.jumpPitchRange.x, sfx.jumpPitchRange.y);
-                footstepSource.PlayOneShot(sfx.jumpSounds[Random.Range(0, sfx.jumpSounds.Length)]);
+                wasJumpingLastFrame = false; // Allow the player to jump again
             }
         }
         else
         {
-            // Falling
-            if (Input.GetButton("Jump") && velocity.y > 0 && !Input.GetButton("Jump"))
-            {
-                velocity.y *= 0.5f;
-            }
-
-            if (Input.GetButton("Jump") && isJumping)
-            {
-                if (jumpTimeCounter > 0)
-                {
-                    jumpTimeCounter -= Time.deltaTime;
-                }
-                else
-                {
-                    isJumping = false;
-                }
-            }
-            else if (Input.GetButtonUp("Jump"))
-            {
-                isJumping = false;
-            }
-
+            // Gravity
             velocity.y += gravity * Time.deltaTime;
         }
 
-        // Move the controller with the calculated velocity
-        controller.Move(velocity * Time.deltaTime);
-
-        // If the player was jumping and has now hit the ground, set isJumping to false
-        if (isJumping && controller.isGrounded)
-        {
-            isJumping = false;
-        }
+        // Apply velocity (ONLY VERTICAL)
+        controller.Move(Vector3.up * velocity.y * Time.deltaTime);
     }
 
+    private void ProcessPlayerMovement()
+    {
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
+
+        bool isMoving = horizontal != 0 || vertical != 0;
+
+        PlayerState newState = PlayerState.Idle;
+
+        if (isMoving)
+        {
+            float moveSpeed = (currentStamina > 0 && isShiftHeld && canRun) ? runSpeed : walkSpeed;
+            speed = moveSpeed; // Updating speed variable
+            newState = (moveSpeed == runSpeed) ? PlayerState.Running : PlayerState.Walking;
+
+            Vector3 move = transform.right * horizontal + transform.forward * vertical;
+            controller.Move(move.normalized * moveSpeed * Time.deltaTime);  // Use Move instead of SimpleMove
+        }
+        else
+        {
+            // Stop player movement immediately when no input is detected
+            controller.Move(Vector3.zero);  // Use Move instead of SimpleMove
+        }
+
+        currentState = newState;
+        isRunning = isShiftHeld && isMoving;
+    }
+
+
+    private void ProcessGroundState()
+    {
+        bool wasGroundedPreviousFrame = isGrounded;
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
+
+        if (isGrounded && !wasGroundedPreviousFrame)
+        {
+            velocity.y = -gravity * Time.deltaTime; // This will keep the player on the ground
+        }
+    }
     private void Fall()
     {
-        // Decrease the y velocity to simulate a fall
-        // If the player lets go of the jump button mid-air, cut their upward speed short
-        if (!isJumpButtonHeld && velocity.y > 0)
+        if (!Input.GetButton("Jump") && velocity.y > 0)
         {
-            velocity.y *= 0.5f;
+            velocity.y *= 0.5f; // Reduce upward speed if jump button is released mid-air
         }
 
         velocity.y += gravity * Time.deltaTime;
         isJumping = false;
         isFalling = true;
     }
-
-    private void ProcessGroundState()
-    {
-        bool wasGrounded = isGrounded;
-        isGrounded = controller.isGrounded;
-
-        if (!wasGrounded && isGrounded && hasJumped)
-        {
-            actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-            actionSource.PlayOneShot(landSound);
-            hasJumped = false;
-            isBoosting = false;
-        }
-    }
-
-    private void ProcessPlayerMovement()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
-
-        Vector3 move = transform.right * horizontal + transform.forward * vertical;
-
-        if (move.magnitude > 0)
-        {
-            float moveSpeed = walkSpeed;
-            if (currentStamina > 0 && isShiftHeld && canRun)
-            {
-                moveSpeed = runSpeed;
-                currentState = PlayerState.Running;
-            }
-            else
-            {
-                currentState = PlayerState.Walking;
-            }
-            controller.Move(move.normalized * moveSpeed * Time.deltaTime);
-        }
-        else
-        {
-            currentState = PlayerState.Idle;
-        }
-    }
-
     private void ClimbLadder()
     {
         Vector3 up = transform.up;
@@ -556,7 +466,6 @@ public class PlayerController : MonoBehaviour
         Vector3 climbDirection = (up * verticalInput + right * horizontalInput + forward * verticalInput).normalized;
         controller.Move(climbDirection * climbSpeed * Time.fixedDeltaTime);
     }
-
     private void ProcessPlayerFOV()
     {
         float targetFOV = defaultFOV;
@@ -568,7 +477,6 @@ public class PlayerController : MonoBehaviour
 
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, fovTransitionSpeed * Time.deltaTime);
     }
-
     private void ProcessMouseLook()
     {
         float mouseLookX = Input.GetAxis("Mouse X") * mouseSensitivity;
@@ -581,8 +489,6 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(Vector3.up * mouseLookX);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
-
-
     private void ProcessLand()
     {
         if (!wasGrounded && isGrounded)
@@ -592,7 +498,6 @@ public class PlayerController : MonoBehaviour
             footstepSource.PlayOneShot(sfx.landSounds[Random.Range(0, sfx.landSounds.Length)]);
         }
     }
-
     private IEnumerator Boost(KeyCode key)
     {
         if (!boostEnabled)
@@ -639,14 +544,11 @@ public class PlayerController : MonoBehaviour
             audioSource.Play();
         }
     }
-
     public class BoostSound
     {
         public AudioClip clip;
         public Vector2 pitchRange;
     }
-
-
     private void ProcessFootsteps()
     {
         Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
@@ -678,7 +580,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private SurfaceFootstepSFX GetFootstepSFXForCurrentSurface()
     {
         RaycastHit hit;
@@ -689,8 +590,6 @@ public class PlayerController : MonoBehaviour
 
             foreach (SurfaceFootstepSFX sfx in footstepSFXs)
             {
-                Debug.Log("Checking SFX for tag: " + sfx.tag);
-
                 if (sfx.tag == surfaceTag)
                 {
                     Debug.Log("Matched SFX found for tag: " + sfx.tag);
@@ -698,11 +597,8 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log("No matched SFX found, defaulting to first in list");
         return footstepSFXs[0];
     }
-
     private void HandleBobbing()
     {
         float bobbingSpeed = 0f;

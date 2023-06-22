@@ -47598,11 +47598,13 @@ MonoBehaviour:
   holdToJump: 0
   runJumpForce: 3
   walkJumpForce: 1.5
+  fallThreshold: 10
+  landingTime: 0.1
   groundCheck: {fileID: 1617178588}
   groundCheckRadius: 0.2
   groundMask:
     serializedVersion: 2
-    m_Bits: 33554432
+    m_Bits: 3724541971
   boostedGravityMultiplier: 3
   gravity: -7
   boostForceW: 30
