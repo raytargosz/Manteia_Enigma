@@ -47586,27 +47586,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5eea5c3af9eca840a8df2cd10094a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 8
   walkSpeed: 5
-  runSpeed: 10
-  jumpForce: 2
-  jumpHeight: 2
+  runSpeed: 8
+  jumpForce: 1
+  jumpHeight: 4
   moveSpeed: 5
-  fallSpeed: 12.5
+  fallSpeed: 11
   climbSpeed: 50
-  jumpTime: 0.35
+  jumpTime: 0.1
   holdToJump: 0
-  runJumpForce: 3
-  walkJumpForce: 1.5
-  fallThreshold: 10
-  landingTime: 0.1
-  groundCheck: {fileID: 1617178588}
+  runJumpForce: 15
+  walkJumpForce: 4
+  fallThreshold: 30
+  landingTime: 5
+  groundCheck: {fileID: 1521499238}
   groundCheckRadius: 0.2
   groundMask:
     serializedVersion: 2
-    m_Bits: 3724541971
+    m_Bits: 4261412915
   boostedGravityMultiplier: 3
-  gravity: -7
+  gravity: -19.81
   boostForceW: 30
   boostForceA: 25
   boostForceS: 20
@@ -47871,7 +47871,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521499231}
   m_LocalRotation: {x: -0, y: -0.41774604, z: -0, w: 0.90856385}
-  m_LocalPosition: {x: -15.87, y: 1.66, z: -7.4}
+  m_LocalPosition: {x: -15.467, y: 1.66, z: -7.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

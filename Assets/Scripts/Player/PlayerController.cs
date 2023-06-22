@@ -8,27 +8,30 @@ public class PlayerController : MonoBehaviour
 {
     // Character Controller
     private CharacterController controller;
+
     // Camera Settings
     private Camera playerCamera;
     private float defaultCameraYPos;
     private float bobbingCounter = 0f;
+
     // Player Movement Settings
     [Header("Movement")]
-    public float speed = 5.0f;
     [SerializeField, Tooltip("Normal speed of the player")]
-    public float walkSpeed = 3f;
+    private float speed = 5.0f;
+    [SerializeField, Tooltip("Walking speed of the player")]
+    private float walkSpeed = 3f;
     [SerializeField, Tooltip("Running speed of the player")]
-    public float runSpeed = 6f;
+    private float runSpeed = 6f;
     [SerializeField, Tooltip("Jump force for the regular jump")]
-    public float jumpForce = 2f;
+    private float jumpForce = 2f;
     [SerializeField, Tooltip("Height of the jump")]
-    public float jumpHeight = 2.0f;
+    private float jumpHeight = 2.0f;
     [SerializeField, Tooltip("Player's moving speed")]
-    public float moveSpeed = 5f;
+    private float moveSpeed = 5f;
     [SerializeField, Tooltip("The speed at which the player falls after a jump")]
-    public float fallSpeed = 2.5f;
+    private float fallSpeed = 2.5f;
     [SerializeField, Tooltip("Climbing speed of the player")]
-    public float climbSpeed = 3f;
+    private float climbSpeed = 3f;
 
     private bool isJumping = false;
     private bool isFalling = false;
@@ -44,26 +47,30 @@ public class PlayerController : MonoBehaviour
     private bool rightFootNext = true;
     private bool isClimbing = false;
     private bool jumpQueued = false;
+    private bool wasJumpingLastFrame = false;
+    private float jumpTimeCounter;
 
-    // Jump Settings
     [Header("Jump")]
     [SerializeField, Tooltip("Max time the jump button can be held")]
-    public float jumpTime = 0.35f;
-    private float jumpTimeCounter;
+    private float jumpTime = 0.35f;
     [SerializeField, Tooltip("Allow holding the button for continuous jumping")]
-    public bool holdToJump = false;
-    private bool isJumpButtonHeld = false;
-    private bool wasJumpingLastFrame = false;
+    private bool holdToJump = false;
     [SerializeField, Tooltip("Jump force while running")]
-    public float runJumpForce = 8.0f;
+    private float runJumpForce = 8.0f;
     [SerializeField, Tooltip("Jump force while walking")]
-    public float walkJumpForce = 5.0f;
-    public float fallThreshold = 10f; // Define the fall threshold value here
-    public float landingTime = 0.1f; // Adjust the landing time value as needed
-    // You need to set these in the Inspector in Unity:
-    public Transform groundCheck; // Drag and drop the transform that represents the 'feet' of your character.
-    public float groundCheckRadius = 0.2f; // Adjust to fit your needs
-    public LayerMask groundMask; // Assign the relevant layer(s) in the Inspector.
+    private float walkJumpForce = 5.0f;
+    [SerializeField, Tooltip("Distance after which falling starts")]
+    private float fallThreshold = 10f;
+    [SerializeField, Tooltip("Time taken for landing after a jump")]
+    private float landingTime = 0.1f;
+    [SerializeField, Tooltip("Object representing the feet of the character")]
+    private Transform groundCheck;
+    [SerializeField, Tooltip("Radius for ground check")]
+    private float groundCheckRadius = 0.2f;
+    [SerializeField, Tooltip("Layers considered as ground")]
+    private LayerMask groundMask;
+
+
     // Boost Settings
     [Header("Boost Variables")]
     [SerializeField, Tooltip("Gravity multiplier after boosting")]
@@ -92,6 +99,7 @@ public class PlayerController : MonoBehaviour
     private float boostCooldown = 3f;
     private bool boostEnabled;
     public bool isBoostEnabled = true;
+
     // Camera Bobbing
     [Header("Camera Bobbing")]
     [SerializeField, Tooltip("Bobbing speed when idle")]
@@ -303,6 +311,7 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
         currentStamina = maxStamina;
         currentBoost = maxBoost;
+        jumpTimeCounter = jumpTime;
 
         // Assign boost sounds to respective keys
         boostSounds.Add(KeyCode.W, boostSoundW);
@@ -341,7 +350,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Check for ground state
-        ProcessGroundState();
+        isGrounded = controller.isGrounded;
 
         // Process the new jump function
         ProcessJump();
@@ -354,55 +363,71 @@ public class PlayerController : MonoBehaviour
 
         HandleBobbing();
 
-        // Check for jump input
-        if (Input.GetButtonDown("Jump") && isGrounded && !isJumping)
+        // If the player is on the ground and not currently jumping, forcefully keep them on the ground
+        if (isGrounded && !isJumping)
         {
-            isJumping = true;
+            velocity.y = -2f;
         }
 
         wasJumpingLastFrame = isJumping;
     }
-
     void FixedUpdate()
     {
-        // Apply gravity
-        if (!isGrounded)
-        {
-            velocity.y += gravity * Time.fixedDeltaTime;
-        }
-        else if (isFalling)
-        {
-            // Check if the player was falling
-            Fall();
-            isFalling = false;
-        }
-
+        // Apply the velocity
         controller.Move(velocity * Time.fixedDeltaTime);
-    }
 
+        // If we're on the ground, reset Y velocity
+        if (isGrounded)
+        {
+            velocity.y = 0f;
+        }
+    }
     private void ProcessJump()
     {
         if (isGrounded)
         {
-            velocity.y = 0f; // Reset vertical velocity while grounded
-
-            if (Input.GetButtonDown("Jump") && !wasJumpingLastFrame)
+            if (Input.GetButtonDown("Jump"))
             {
-                velocity.y = Mathf.Sqrt(2f * jumpHeight * Mathf.Abs(gravity));
                 isJumping = true;
-                wasJumpingLastFrame = false; // Allow the player to jump again
+                jumpTimeCounter = jumpTime;
+
+                // Increase jump force
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpForce;
             }
+        }
+
+        // While the Jump button is being held AND we haven't exceeded our max jump time...
+        if (isJumping && Input.GetButton("Jump") && jumpTimeCounter > 0)
+        {
+            // Keep applying an upward force
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpForce;
+            jumpTimeCounter -= Time.deltaTime;
         }
         else
         {
-            // Gravity
-            velocity.y += gravity * Time.deltaTime;
+            isJumping = false;
         }
 
-        // Apply velocity (ONLY VERTICAL)
-        controller.Move(Vector3.up * velocity.y * Time.deltaTime);
+        if (Input.GetButtonUp("Jump"))
+        {
+            isJumping = false;
+        }
+
+        // Apply additional gravity for quicker fall
+        velocity.y += gravity * 2 * Time.deltaTime;
     }
 
+
+    private void ProcessGroundState()
+    {
+        bool wasGroundedPreviousFrame = isGrounded;
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
+
+        if (isGrounded && !wasGroundedPreviousFrame)
+        {
+            velocity.y = -gravity * Time.deltaTime; // This will keep the player on the ground
+        }
+    }
     private void ProcessPlayerMovement()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
@@ -432,17 +457,6 @@ public class PlayerController : MonoBehaviour
         isRunning = isShiftHeld && isMoving;
     }
 
-
-    private void ProcessGroundState()
-    {
-        bool wasGroundedPreviousFrame = isGrounded;
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundMask);
-
-        if (isGrounded && !wasGroundedPreviousFrame)
-        {
-            velocity.y = -gravity * Time.deltaTime; // This will keep the player on the ground
-        }
-    }
     private void Fall()
     {
         if (!Input.GetButton("Jump") && velocity.y > 0)
