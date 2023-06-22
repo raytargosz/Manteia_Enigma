@@ -69,6 +69,8 @@ public class PlayerController : MonoBehaviour
     private float groundCheckRadius = 0.2f;
     [SerializeField, Tooltip("Layers considered as ground")]
     private LayerMask groundMask;
+    private float coyoteTime;
+    public float maxCoyoteTime = 0.2f;  // Maximum amount of time player can jump after falling off a platform
 
 
     // Boost Settings
@@ -350,7 +352,18 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Check for ground state
+        bool wasGrounded = isGrounded;
         isGrounded = controller.isGrounded;
+
+        // Update Coyote Time
+        if (isGrounded)
+        {
+            coyoteTime = maxCoyoteTime;
+        }
+        else
+        {
+            coyoteTime -= Time.deltaTime;
+        }
 
         // Process the new jump function
         ProcessJump();
@@ -384,6 +397,21 @@ public class PlayerController : MonoBehaviour
     }
     private void ProcessJump()
     {
+        if (coyoteTime > 0)
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                isJumping = true;
+                jumpTimeCounter = jumpTime;
+
+                // Increase jump force
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpForce;
+
+                // Reset coyote time as we've used it
+                coyoteTime = 0;
+            }
+        }
+
         if (isGrounded)
         {
             if (Input.GetButtonDown("Jump"))
