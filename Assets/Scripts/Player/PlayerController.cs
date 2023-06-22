@@ -289,6 +289,9 @@ public class PlayerController : MonoBehaviour
     public float CurrentStamina => currentStamina;
     public float CurrentBoost => currentBoost;
 
+
+
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -413,65 +416,73 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessJump()
     {
-        if (isGrounded && (Input.GetButtonDown("Jump") || Input.GetMouseButtonDown(0)) && !isJumping)
+        if (controller.isGrounded)
         {
-            // Jump code
-            float currentJumpForce = (currentState == PlayerState.Running) ? runJumpForce : walkJumpForce;
-            velocity.y = Mathf.Sqrt(currentJumpForce * -2f * gravity);
-            hasJumped = true;
+            velocity.y = 0f;
+            isJumping = false;
 
-            // Play the jump sound
-            actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
-            actionSource.PlayOneShot(jumpSound);
-
-            // Decrease stamina for the jump
-            currentStamina -= staminaJumpCost;
-            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-
-            // If stamina is zero, disallow running
-            if (currentStamina <= 0)
+            if (Input.GetButtonDown("Jump") && !isJumping)
             {
-                canRun = false;
+                // Jump code
+                float currentJumpForce = (currentState == PlayerState.Running) ? runJumpForce : walkJumpForce;
+                velocity.y = Mathf.Sqrt(currentJumpForce * -2f * gravity);
+                hasJumped = true;
+
+                // Play the jump sound
+                actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
+                actionSource.PlayOneShot(jumpSound);
+
+                // Decrease stamina for the jump
+                currentStamina -= staminaJumpCost;
+                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+                // If stamina is zero, disallow running
+                if (currentStamina <= 0)
+                {
+                    canRun = false;
+                }
+
+                isJumping = true;
+                jumpTimeCounter = jumpTime;
+
+                // Play footstep sound effect
+                SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+                footstepSource.pitch = Random.Range(sfx.jumpPitchRange.x, sfx.jumpPitchRange.y);
+                footstepSource.PlayOneShot(sfx.jumpSounds[Random.Range(0, sfx.jumpSounds.Length)]);
             }
-
-            isJumping = true;
-            jumpTimeCounter = jumpTime;
-
-            // Play footstep sound effect
-            SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
-            footstepSource.pitch = Random.Range(sfx.jumpPitchRange.x, sfx.jumpPitchRange.y);
-            footstepSource.PlayOneShot(sfx.jumpSounds[Random.Range(0, sfx.jumpSounds.Length)]);
         }
-        else if (Input.GetButton("Jump") && isJumping)
+        else
         {
-            if (jumpTimeCounter > 0)
+            // Falling
+            if (Input.GetButton("Jump") && velocity.y > 0 && !Input.GetButton("Jump"))
             {
-                jumpTimeCounter -= Time.deltaTime;
+                velocity.y *= 0.5f;
             }
-            else
+
+            if (Input.GetButton("Jump") && isJumping)
+            {
+                if (jumpTimeCounter > 0)
+                {
+                    jumpTimeCounter -= Time.deltaTime;
+                }
+                else
+                {
+                    isJumping = false;
+                }
+            }
+            else if (Input.GetButtonUp("Jump"))
             {
                 isJumping = false;
             }
-        }
-        else if (Input.GetButtonUp("Jump"))
-        {
-            isJumping = false;
-        }
 
-        // Apply gravity
-        velocity.y += gravity * Time.deltaTime;
-
-        // Reset gravity when grounded
-        if (isGrounded)
-        {
-            velocity.y = 0f;
+            velocity.y += gravity * Time.deltaTime;
         }
 
         // Move the controller with the calculated velocity
         controller.Move(velocity * Time.deltaTime);
 
         // If the player was jumping and has now hit the ground, set isJumping to false
-        if (isJumping && isGrounded)
+        if (isJumping && controller.isGrounded)
         {
             isJumping = false;
         }
@@ -493,45 +504,44 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessGroundState()
     {
+        bool wasGrounded = isGrounded;
         isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = 0f;
-        }
 
-        if (!wasGrounded && isGrounded && hasJumped) // Player has landed after a jump
+        if (!wasGrounded && isGrounded && hasJumped)
         {
             actionSource.pitch = Random.Range(runJumpPitchRange.x, runJumpPitchRange.y);
             actionSource.PlayOneShot(landSound);
-            hasJumped = false; // Reset the hasJumped flag after landing
-            isBoosting = false; // Reset the isBoosting flag after landing
+            hasJumped = false;
+            isBoosting = false;
         }
-        wasGrounded = isGrounded;
     }
 
     private void ProcessPlayerMovement()
     {
-        float moveSpeed;
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        // Only allow running if stamina is not exhausted
-        if ((currentStamina > 0 || !Input.GetKey(KeyCode.LeftShift)) && canRun)
+        Vector3 move = transform.right * horizontal + transform.forward * vertical;
+
+        if (move.magnitude > 0)
         {
-            moveSpeed = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? runSpeed : walkSpeed;
-            currentState = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) ? PlayerState.Running : PlayerState.Walking;
+            float moveSpeed = walkSpeed;
+            if (currentStamina > 0 && isShiftHeld && canRun)
+            {
+                moveSpeed = runSpeed;
+                currentState = PlayerState.Running;
+            }
+            else
+            {
+                currentState = PlayerState.Walking;
+            }
+            controller.Move(move.normalized * moveSpeed * Time.deltaTime);
         }
         else
         {
-            moveSpeed = walkSpeed;
-            currentState = PlayerState.Walking;
+            currentState = PlayerState.Idle;
         }
-
-        // Change the state to Idle if there's no movement
-        if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0) currentState = PlayerState.Idle;
-
-        isRunning = Input.GetKey(KeyCode.LeftShift) ? true : false;
-
-        Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
-        controller.Move(move.normalized * moveSpeed * Time.deltaTime);
     }
 
     private void ClimbLadder()
