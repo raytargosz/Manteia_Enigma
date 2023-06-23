@@ -4,7 +4,7 @@ public class FrameRateLock : MonoBehaviour
 {
     void Start()
     {
-        QualitySettings.vSyncCount = 0;  // VSync must be disabled
-        Application.targetFrameRate = 59;
+        QualitySettings.vSyncCount = 1; 
+        Application.targetFrameRate = 60;
     }
 }

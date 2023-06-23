@@ -1,37 +1,28 @@
 using UnityEngine;
+using TMPro;
 
 public class ScoreManager : MonoBehaviour
 {
-    // Singleton instance
     public static ScoreManager instance;
 
-    // Player's score
+    public TextMeshProUGUI scoreText;
     private int score;
 
     private void Awake()
     {
-        // If an ScoreManager instance exists and it's not this one, destroy this one
-        if (instance != null && instance != this)
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
-        else // Else this instance becomes the singleton instance
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject); // Makes the ScoreManager persistent across scenes
-        }
     }
 
-    // Add to score
-    public void AddScore(int valueToAdd)
+    public void AddScore(int value)
     {
-        score += valueToAdd;
-        Debug.Log("Score: " + score); // This will print the updated score in the console
-    }
-
-    // Get the current score
-    public int GetScore()
-    {
-        return score;
+        score += value;
+        scoreText.text = score.ToString();  // just display the score number
     }
 }
