@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 7a94d36597df03044890f4199792dc87
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Dragon Fire
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: b7c64512ac36a0f499354fe10c26bcb5, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
