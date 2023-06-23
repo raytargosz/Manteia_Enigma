@@ -71,7 +71,8 @@ public class PlayerController : MonoBehaviour
     private LayerMask groundMask;
     private float coyoteTime;
     public float maxCoyoteTime = 0.2f;  // Maximum amount of time player can jump after falling off a platform
-
+    [SerializeField, Tooltip("Jump force while idle")]
+    private float idleJumpForce = 3.0f;
 
     // Boost Settings
     [Header("Boost Variables")]
@@ -398,6 +399,7 @@ public class PlayerController : MonoBehaviour
             velocity.y = 0f;
         }
     }
+
     private void ProcessJump()
     {
         if (coyoteTime > 0)
@@ -406,6 +408,9 @@ public class PlayerController : MonoBehaviour
             {
                 isJumping = true;
                 jumpTimeCounter = jumpTime;
+
+                // Modify jump force according to player's current state
+                float jumpForce = GetCurrentJumpForce();
 
                 // Increase jump force
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpForce;
@@ -421,6 +426,9 @@ public class PlayerController : MonoBehaviour
             {
                 isJumping = true;
                 jumpTimeCounter = jumpTime;
+
+                // Modify jump force according to player's current state
+                float jumpForce = GetCurrentJumpForce();
 
                 // Increase jump force
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpForce;
@@ -447,7 +455,28 @@ public class PlayerController : MonoBehaviour
         // Apply additional gravity for quicker fall
         velocity.y += gravity * 2 * Time.deltaTime;
     }
+    private float GetCurrentJumpForce()
+    {
+        float jumpForce;
 
+        switch (currentState)
+        {
+            case PlayerState.Idle:
+                jumpForce = idleJumpForce; // Add this variable to your class, or substitute an appropriate value
+                break;
+            case PlayerState.Walking:
+                jumpForce = walkJumpForce;
+                break;
+            case PlayerState.Running:
+                jumpForce = runJumpForce;
+                break;
+            default:
+                jumpForce = idleJumpForce;
+                break;
+        }
+
+        return jumpForce;
+    }
 
     private void ProcessGroundState()
     {
