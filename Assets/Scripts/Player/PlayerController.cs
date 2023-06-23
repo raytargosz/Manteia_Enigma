@@ -297,6 +297,12 @@ public class PlayerController : MonoBehaviour
             isClimbing = true;
             Debug.Log("Entered ladder");
         }
+
+        SoundManager soundManager = FindObjectOfType<SoundManager>(); // Cache this reference
+        if (soundManager != null)
+        {
+            soundManager.PlaySound(other.gameObject.tag, "landing");
+        }
     }
     void OnTriggerExit(Collider other)
     {
@@ -306,6 +312,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Exited ladder");
         }
     }
+
     void Start()
     {
         QualitySettings.vSyncCount = 1;
