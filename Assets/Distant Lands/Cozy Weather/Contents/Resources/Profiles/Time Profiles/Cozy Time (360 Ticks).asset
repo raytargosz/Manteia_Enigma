@@ -46,7 +46,7 @@ MonoBehaviour:
   realisticYear: 0
   useLeapYear: 0
   resetTicksOnStart: 1
-  startTicks: 275
+  startTicks: 90
   ticksPerDay: 360
   tickSpeed: 0.1
   tickSpeedMultiplier:

@@ -315,8 +315,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        QualitySettings.vSyncCount = 1;
-        Application.targetFrameRate = 60;
 
         InitializePlayer();
         InitializeSoundAndForces();
@@ -406,7 +404,6 @@ public class PlayerController : MonoBehaviour
             velocity.y = 0f;
         }
     }
-
     private void ProcessJump()
     {
         if (coyoteTime > 0)
