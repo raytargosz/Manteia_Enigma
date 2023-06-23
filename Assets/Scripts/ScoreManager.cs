@@ -26,6 +26,7 @@ public class ScoreManager : MonoBehaviour
     public void AddScore(int valueToAdd)
     {
         score += valueToAdd;
+        Debug.Log("Score: " + score); // This will print the updated score in the console
     }
 
     // Get the current score

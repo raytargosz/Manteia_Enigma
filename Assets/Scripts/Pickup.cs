@@ -1,34 +1,28 @@
 using UnityEngine;
-using TMPro;
 
 public class Pickup : MonoBehaviour
 {
-    public int scoreValue = 1;       // Value to add to the score when picked up
-    public AudioSource pickupSFX;    // Sound effect to play when picked up
-    public GameObject pickupVFX;     // Visual effect to instantiate when picked up
-    public TextMeshProUGUI scoreText; // TMP Text component to display the score
+    public int scoreValue = 1;
+    public AudioClip pickupSFX;
+    public GameObject pickupVFX;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            // Update score
+            Debug.Log("Player collided with pickup!");
+
             ScoreManager.instance.AddScore(scoreValue);
-            scoreText.text = ScoreManager.instance.GetScore().ToString();
 
-            // Play audio, if an AudioSource is provided
             if (pickupSFX != null)
-            {
-                pickupSFX.Play();
-            }
+                AudioSource.PlayClipAtPoint(pickupSFX, transform.position);
 
-            // Play visual effect, if a prefab is provided
             if (pickupVFX != null)
             {
-                Instantiate(pickupVFX, transform.position, transform.rotation);
+                var vfx = Instantiate(pickupVFX, transform.position, Quaternion.identity);
+                Destroy(vfx, 5f);
             }
 
-            // Destroy the pickup object
             Destroy(gameObject);
         }
     }
