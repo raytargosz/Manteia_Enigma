@@ -317,6 +317,12 @@ public class PlayerController : MonoBehaviour
         {
             soundManager.PlaySound(other.gameObject.tag, "landing");
         }
+
+        if (other.gameObject.CompareTag("Fireball"))
+        {
+            Debug.Log("Player died");
+            // Implement death logic here
+        }
     }
 
     void OnTriggerExit(Collider other)

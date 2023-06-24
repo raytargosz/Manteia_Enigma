@@ -12,6 +12,7 @@ TagManager:
   - Ground_Cement
   - Ladder
   - Ground_Metal
+  - Fireball
   layers:
   - Default
   - TransparentFX
