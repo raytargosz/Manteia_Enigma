@@ -11,6 +11,7 @@ TagManager:
   - Ground_Wood
   - Ground_Cement
   - Ladder
+  - Ground_Metal
   layers:
   - Default
   - TransparentFX
