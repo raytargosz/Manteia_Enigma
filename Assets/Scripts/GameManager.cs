@@ -49,17 +49,23 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ShowGameOver()
     {
+        // Pause the game
+        Time.timeScale = 0f;
+
+        // Enable the panel image and set its alpha to 0
         gameOverPanel.SetActive(true);
+        Color panelColor = panelImage.color;
+        panelColor.a = 0f;
+        panelImage.color = panelColor;
 
         // Lerp the alpha of the panel image to 0.75
         float duration = 2.0f;
         float elapsed = 0;
-        Color tempColor = panelImage.color;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
-            tempColor.a = Mathf.Lerp(0, 0.75f, elapsed / duration);
-            panelImage.color = tempColor;
+            elapsed += Time.unscaledDeltaTime;
+            panelColor.a = Mathf.Lerp(0, 0.50f, elapsed / duration);
+            panelImage.color = panelColor;
             yield return null;
         }
 
@@ -74,15 +80,19 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CameraFallAndBounce());
     }
 
+
     private IEnumerator FadeInText(TextMeshProUGUI text, float duration)
     {
+        Color textColor = text.color;
+        textColor.a = 0f;
+        text.color = textColor;
+
         float elapsed = 0;
-        Color tempColor = text.color;
         while (elapsed < duration)
         {
-            elapsed += Time.deltaTime;
-            tempColor.a = Mathf.Lerp(0, 1, elapsed / duration);
-            text.color = tempColor;
+            elapsed += Time.unscaledDeltaTime;
+            textColor.a = Mathf.Lerp(0, 1, elapsed / duration);
+            text.color = textColor;
             yield return null;
         }
     }
@@ -90,7 +100,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator CameraFallAndBounce()
     {
         // Wait for a moment before the camera starts to fall
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
 
         // Perform the fall and bounce
         float fallTime = 0.5f; // Duration for each fall
@@ -99,14 +109,34 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < 4; i++) // Four bounces
         {
-            float startTime = Time.time;
-            while (Time.time - startTime < fallTime)
+            float startTime = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup - startTime < fallTime)
             {
-                float newY = Mathf.Lerp(originalY, originalY - bounceHeight, (Time.time - startTime) / fallTime);
+                float newY = Mathf.Lerp(originalY, originalY - bounceHeight, (Time.realtimeSinceStartup - startTime) / fallTime);
                 mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, newY, mainCamera.transform.position.z);
                 yield return null;
             }
-            startTime = Time.time;
-            while (Time.time - startTime < fallTime)
+
+            if (i == 3)
             {
-                float newY
+                // Disable the camera movement if it has reached the floor
+                mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, originalY - 4 * bounceHeight, mainCamera.transform.position.z);
+                break;
+            }
+
+            startTime = Time.realtimeSinceStartup;
+            while (Time.realtimeSinceStartup - startTime < fallTime)
+            {
+                float newY = Mathf.Lerp(originalY - bounceHeight, originalY, (Time.realtimeSinceStartup - startTime) / fallTime);
+                mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, newY, mainCamera.transform.position.z);
+                yield return null;
+            }
+        }
+
+        // Pause for a moment at the final camera position
+        yield return new WaitForSecondsRealtime(2f);
+
+        // Resume the game
+        Time.timeScale = 1f;
+    }
+}
