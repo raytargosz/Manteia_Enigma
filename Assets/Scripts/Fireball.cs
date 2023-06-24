@@ -7,13 +7,18 @@ public class Fireball : MonoBehaviour
     public AudioClip[] impactSFX; // Array of impact sounds for collision
     public AudioSource spawnAndMovingAudio; // Set audio source for spawn and moving
     public AudioClip[] spawnAndMovingSFX; // Array of sounds for spawn and moving
+    public float fireballLifetime = 10.0f; // Fireball life time
 
     private Rigidbody rb;
     private Vector3 direction;
+    private float lifespanTimer; // Timer for the fireball's life
+    private bool canCollideWithNonPlayer; // Whether the fireball can collide with non-player objects
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        lifespanTimer = 0;
+        canCollideWithNonPlayer = false;
     }
 
     public void SetDirection(Vector3 dir)
@@ -23,28 +28,38 @@ public class Fireball : MonoBehaviour
 
     private void Start()
     {
-        // Give the fireball an initial speed in the direction it's facing
         rb.velocity = direction * speed;
-
-        // Play a random SFX for spawn and moving
         PlayRandomSFX(spawnAndMovingAudio, spawnAndMovingSFX);
+        Invoke("AllowCollisionsWithNonPlayer", fireballLifetime * 0.5f);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Update()
     {
-        // Check if the fireball has hit the player
-        if (collision.gameObject.CompareTag("Player"))
+        lifespanTimer += Time.deltaTime;
+
+        if (lifespanTimer >= fireballLifetime)
+        {
+            PlayRandomSFX(impactAudio, impactSFX);
+            Destroy(this.gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("Player"))
         {
             Debug.Log("Player hit by fireball!");
-            // Implement logic here for what happens when the player is hit
-            GameManager.Instance.GameOver(); // Let's assume there's a GameManager handling game states
+            GameManager.Instance.GameOver();
+            PlayRandomSFX(impactAudio, impactSFX);
+            Destroy(this.gameObject);
         }
-
-        PlayRandomSFX(impactAudio, impactSFX);
-        Destroy(this.gameObject, impactAudio.clip.length);  // Destroy the fireball after impact sound has played
+        else if (canCollideWithNonPlayer)
+        {
+            PlayRandomSFX(impactAudio, impactSFX);
+            Destroy(this.gameObject);
+        }
     }
 
-    // Method to play a random SFX from the array
     private void PlayRandomSFX(AudioSource audioSource, AudioClip[] audioClips)
     {
         if (audioClips.Length > 0)
@@ -57,7 +72,11 @@ public class Fireball : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Stop the moving sound effect when the fireball is destroyed
         spawnAndMovingAudio.Stop();
+    }
+
+    private void AllowCollisionsWithNonPlayer()
+    {
+        canCollideWithNonPlayer = true;
     }
 }

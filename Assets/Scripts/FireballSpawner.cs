@@ -14,18 +14,15 @@ public class FireballSpawner : MonoBehaviour
 
     private void SpawnFireball()
     {
-        if (!gameIsOver)
+        GameObject fireball = Instantiate(fireballPrefab, transform.position, transform.rotation);
+        Fireball fireballScript = fireball.GetComponent<Fireball>();
+
+        if (fireballScript != null)
         {
-            GameObject fireball = Instantiate(fireballPrefab, transform.position, transform.rotation);
-            Fireball fireballScript = fireball.GetComponent<Fireball>();
-
-            if (fireballScript != null)
-            {
-                fireballScript.SetDirection(transform.forward);
-            }
-
-            Destroy(fireball, fireballLifetime);
+            fireballScript.SetDirection(transform.forward);
         }
+
+        Destroy(fireball, fireballLifetime);
     }
 
     // Draw a gizmo in the scene view
