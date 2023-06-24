@@ -49,6 +49,9 @@ public class PlayerController : MonoBehaviour
     private bool jumpQueued = false;
     private bool wasJumpingLastFrame = false;
     private float jumpTimeCounter;
+    private SurfaceFootstepSFX lastUsedSFXGroup = NullSFX;
+    private static readonly SurfaceFootstepSFX NullSFX = new SurfaceFootstepSFX();
+
 
     [Header("Jump")]
     [SerializeField, Tooltip("Max time the jump button can be held")]
@@ -263,7 +266,6 @@ public class PlayerController : MonoBehaviour
         [Tooltip("Range of possible pitch adjustments for turn sounds (to add variety)")]
         public Vector2 turnPitchRange;
     }
-    // Add a variable to track the current player state
     private PlayerState currentState = PlayerState.Idle;
     public enum PlayerState
     {
@@ -273,23 +275,28 @@ public class PlayerController : MonoBehaviour
         Jumping,
         Boosting,
     }
+
     public PlayerState GetCurrentState()
     {
         return currentState;
     }
+
     private float yRotation = 0f;
     private float xRotation = 0f;
     private float footstepCounter = 0f;
-    // Public getters for current health, stamina, and boost
+
     public float CurrentHealth => currentHealth;
     public float CurrentStamina => currentStamina;
     public float CurrentBoost => currentBoost;
 
+    private SoundManager soundManager; // Added reference to SoundManager
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        soundManager = FindObjectOfType<SoundManager>(); // Cache the reference to SoundManager
     }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Ladder"))
@@ -298,12 +305,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Entered ladder");
         }
 
-        SoundManager soundManager = FindObjectOfType<SoundManager>(); // Cache this reference
         if (soundManager != null)
         {
             soundManager.PlaySound(other.gameObject.tag, "landing");
         }
     }
+
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Ladder"))
@@ -315,7 +322,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-
         InitializePlayer();
         InitializeSoundAndForces();
 
@@ -324,12 +330,17 @@ public class PlayerController : MonoBehaviour
         currentBoost = maxBoost;
         jumpTimeCounter = jumpTime;
 
-        // Assign boost sounds to respective keys
         boostSounds.Add(KeyCode.W, boostSoundW);
         boostSounds.Add(KeyCode.A, boostSoundA);
         boostSounds.Add(KeyCode.S, boostSoundS);
         boostSounds.Add(KeyCode.D, boostSoundD);
+
+        if (footstepSFXs.Length > 0)
+        {
+            lastUsedSFXGroup = footstepSFXs[0];
+        }
     }
+
     private void InitializePlayer()
     {
         controller = GetComponent<CharacterController>();
@@ -346,6 +357,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+
     private void InitializeSoundAndForces()
     {
         isGrounded = controller.isGrounded;
@@ -627,37 +639,56 @@ public class PlayerController : MonoBehaviour
         public AudioClip clip;
         public Vector2 pitchRange;
     }
+
     private void ProcessFootsteps()
     {
-        Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
-
-        if (isGrounded)
+        if (!isGrounded || currentState == PlayerState.Idle)
         {
-            if (move.magnitude > 0)
-            {
-                footstepCounter -= Time.deltaTime;
-                if (footstepCounter <= 0)
-                {
-                    SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
-                    AudioClip nextFootstepSound = rightFootNext ? sfx.walkSounds[Random.Range(0, sfx.walkSounds.Length)] : sfx.runSounds[Random.Range(0, sfx.runSounds.Length)];
-                    footstepSource.pitch = (currentState == PlayerState.Running) ? Random.Range(sfx.runPitchRange.x, sfx.runPitchRange.y) : Random.Range(sfx.walkPitchRange.x, sfx.walkPitchRange.y);
-                    footstepSource.PlayOneShot(nextFootstepSound);
-                    rightFootNext = !rightFootNext;
-                    footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
-                }
-            }
+            return;
+        }
 
-            // Check if player state is idle before playing the turning sound
-            if (currentState == PlayerState.Idle && Input.GetAxis("Mouse X") != 0 && Time.time > lastTurnTime + turnCooldown)
+        Vector3 move = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");
+        if (move.magnitude > 0)
+        {
+            footstepCounter -= Time.deltaTime;
+            if (footstepCounter <= 0)
             {
                 SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
-                AudioClip turnSound = sfx.turnSounds[Random.Range(0, sfx.turnSounds.Length)];
-                turnSource.pitch = Random.Range(sfx.turnPitchRange.x, sfx.turnPitchRange.y);
-                turnSource.PlayOneShot(turnSound);
-                lastTurnTime = Time.time;
+                if (ReferenceEquals(sfx, null))
+                {
+                    sfx = lastUsedSFXGroup;
+                }
+                else
+                {
+                    lastUsedSFXGroup = sfx;
+                }
+
+                AudioClip nextFootstepSound = rightFootNext ? sfx.walkSounds[Random.Range(0, sfx.walkSounds.Length)] : sfx.runSounds[Random.Range(0, sfx.runSounds.Length)];
+                footstepSource.pitch = (currentState == PlayerState.Running) ? Random.Range(sfx.runPitchRange.x, sfx.runPitchRange.y) : Random.Range(sfx.walkPitchRange.x, sfx.walkPitchRange.y);
+                footstepSource.PlayOneShot(nextFootstepSound);
+                rightFootNext = !rightFootNext;
+                footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
             }
         }
+        else if (Input.GetAxis("Mouse X") != 0 && Time.time > lastTurnTime + turnCooldown)
+        {
+            SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
+            if (ReferenceEquals(sfx, null))
+            {
+                sfx = lastUsedSFXGroup;
+            }
+            else
+            {
+                lastUsedSFXGroup = sfx;
+            }
+
+            AudioClip turnSound = sfx.turnSounds[Random.Range(0, sfx.turnSounds.Length)];
+            turnSource.pitch = Random.Range(sfx.turnPitchRange.x, sfx.turnPitchRange.y);
+            turnSource.PlayOneShot(turnSound);
+            lastTurnTime = Time.time;
+        }
     }
+
     private SurfaceFootstepSFX GetFootstepSFXForCurrentSurface()
     {
         RaycastHit hit;
