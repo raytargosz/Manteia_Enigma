@@ -194,6 +194,14 @@ public class PlayerController : MonoBehaviour
     private float runFootstepInterval = 0.3f;
     public float turnCooldown = 0.5f;
     private float lastTurnTime = 0f;
+
+    [System.Serializable]
+    public class BoostSound
+    {
+        public AudioClip clip;
+        public Vector2 pitchRange;
+    }
+
     // Sound Pitch Variation
     [Header("Sound Pitch Variation")]
     [SerializeField, Tooltip("Min and max pitch for walking footsteps")]
@@ -471,27 +479,15 @@ public class PlayerController : MonoBehaviour
         // Apply additional gravity for quicker fall
         velocity.y += gravity * 2 * Time.deltaTime;
     }
+
     private float GetCurrentJumpForce()
     {
-        float jumpForce;
-
-        switch (currentState)
+        return currentState switch
         {
-            case PlayerState.Idle:
-                jumpForce = idleJumpForce; // Add this variable to your class, or substitute an appropriate value
-                break;
-            case PlayerState.Walking:
-                jumpForce = walkJumpForce;
-                break;
-            case PlayerState.Running:
-                jumpForce = runJumpForce;
-                break;
-            default:
-                jumpForce = idleJumpForce;
-                break;
-        }
-
-        return jumpForce;
+            PlayerState.Walking => walkJumpForce,
+            PlayerState.Running => runJumpForce,
+            _ => idleJumpForce,
+        };
     }
 
     private void ProcessGroundState()
@@ -501,35 +497,31 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded && !wasGroundedPreviousFrame)
         {
-            velocity.y = -gravity * Time.deltaTime; // This will keep the player on the ground
+            velocity.y = -gravity * Time.deltaTime;
         }
     }
+
     private void ProcessPlayerMovement()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         bool isShiftHeld = Input.GetKey(KeyCode.LeftShift);
 
-        bool isMoving = horizontal != 0 || vertical != 0;
-
-        PlayerState newState = PlayerState.Idle;
+        bool isMoving = Mathf.Abs(horizontal) > 0.01f || Mathf.Abs(vertical) > 0.01f;
 
         if (isMoving)
         {
             float moveSpeed = (currentStamina > 0 && isShiftHeld && canRun) ? runSpeed : walkSpeed;
-            speed = moveSpeed; // Updating speed variable
-            newState = (moveSpeed == runSpeed) ? PlayerState.Running : PlayerState.Walking;
-
             Vector3 move = transform.right * horizontal + transform.forward * vertical;
-            controller.Move(move.normalized * moveSpeed * Time.deltaTime);  // Use Move instead of SimpleMove
+            controller.Move(move.normalized * moveSpeed * Time.deltaTime);
+            currentState = (moveSpeed == runSpeed) ? PlayerState.Running : PlayerState.Walking;
         }
         else
         {
-            // Stop player movement immediately when no input is detected
-            controller.Move(Vector3.zero);  // Use Move instead of SimpleMove
+            controller.Move(Vector3.zero);
+            currentState = PlayerState.Idle;
         }
 
-        currentState = newState;
         isRunning = isShiftHeld && isMoving;
     }
 
@@ -537,47 +529,61 @@ public class PlayerController : MonoBehaviour
     {
         if (!Input.GetButton("Jump") && velocity.y > 0)
         {
-            velocity.y *= 0.5f; // Reduce upward speed if jump button is released mid-air
+            velocity.y *= 0.5f;
         }
 
         velocity.y += gravity * Time.deltaTime;
         isJumping = false;
         isFalling = true;
     }
+
     private void ClimbLadder()
     {
-        Vector3 up = transform.up;
-        Vector3 forward = transform.forward;
-        Vector3 right = transform.right;
-
-        float verticalInput = Input.GetAxis("Vertical");
-        float horizontalInput = Input.GetAxis("Horizontal");
-
-        Vector3 climbDirection = (up * verticalInput + right * horizontalInput + forward * verticalInput).normalized;
+        Vector3 climbDirection = (transform.up * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")).normalized;
         controller.Move(climbDirection * climbSpeed * Time.fixedDeltaTime);
     }
+
     private void ProcessPlayerFOV()
     {
-        float targetFOV = defaultFOV;
-
-        if (isRunning && controller.velocity.magnitude > 0.1f)
-        {
-            targetFOV = runFOV;
-        }
-
+        float targetFOV = isRunning && controller.velocity.sqrMagnitude > 0.01f ? runFOV : defaultFOV;
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, fovTransitionSpeed * Time.deltaTime);
     }
+
     private void ProcessMouseLook()
     {
         float mouseLookX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseLookY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        xRotation -= mouseLookY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);  // This line restricts the camera's vertical movement (up and down) so it doesn't exceed a realistic range (90 degrees)
+        xRotation = Mathf.Clamp(xRotation - mouseLookY, -90f, 90f);
 
-        // rotate the player model horizontally and the camera vertically
         transform.Rotate(Vector3.up * mouseLookX);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+    }
+
+    private IEnumerator Boost(KeyCode key)
+    {
+        if (!boostEnabled || !boostSounds.TryGetValue(key, out BoostSound boostSound))
+        {
+            yield break;
+        }
+
+        actionSource.pitch = UnityEngine.Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
+        actionSource.PlayOneShot(boostSound.clip);
+
+        isBoosting = true;
+        float boostTimer = 0.5f;
+        Vector3 boostDirectionWithY = new Vector3(boostDirection.x, boostYForce, boostDirection.z);
+
+        while (boostTimer > 0)
+        {
+            velocity += boostDirectionWithY.normalized * boostForces[key] * Time.deltaTime;
+            boostTimer -= Time.deltaTime;
+            yield return null;
+        }
+
+        isBoosting = false;
+        velocity = new Vector3(0, velocity.y, 0);
+        isFallingAfterBoost = true;
     }
 
     private void ProcessLand()
@@ -585,72 +591,17 @@ public class PlayerController : MonoBehaviour
         if (!wasGrounded && isGrounded)
         {
             SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
-            footstepSource.pitch = Random.Range(sfx.landPitchRange.x, sfx.landPitchRange.y);
-            footstepSource.PlayOneShot(sfx.landSounds[Random.Range(0, sfx.landSounds.Length)]);
+            footstepSource.pitch = UnityEngine.Random.Range(sfx.landPitchRange.x, sfx.landPitchRange.y);
+            footstepSource.PlayOneShot(sfx.landSounds[UnityEngine.Random.Range(0, sfx.landSounds.Length)]);
 
-            // Reset footstep interval when landing
             ResetFootstepCounter();
         }
     }
-
     private void ResetFootstepCounter()
     {
         // if the player is running, set the footstep counter to the run interval
         // otherwise, set it to the walk interval
         footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
-    }
-
-
-    private IEnumerator Boost(KeyCode key)
-    {
-        if (!boostEnabled)
-        {
-            yield break;  // Stop the execution of the coroutine
-        }
-
-        BoostSound boostSound;
-        if (!boostSounds.TryGetValue(key, out boostSound))
-        {
-            Debug.LogError("No boost sound associated with this key.");
-            yield break;
-        }
-
-        // Now you can use boostSound.clip as the sound clip to play
-        actionSource.clip = boostSound.clip;
-        actionSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
-        actionSource.Play();
-
-        isBoosting = true;
-        float boostTimer = 0.5f;  // Adjust this value to control the duration of the boost
-
-        Vector3 boostDirectionWithY = new Vector3(boostDirection.x, boostYForce, boostDirection.z); // Creating a new vector with Y value to lift the player upwards
-
-        while (boostTimer > 0)
-        {
-            velocity += boostDirectionWithY.normalized * boostForces[key] * Time.deltaTime; // Use the modified boost direction
-            boostTimer -= Time.deltaTime;
-            yield return null;
-        }
-
-        isBoosting = false;
-        velocity = new Vector3(0, velocity.y, 0);  // Reset horizontal velocity
-        isFallingAfterBoost = true;  // Set this flag to true after the boost
-    }
-    private void PlayBoostSound()
-    {
-        // Only play the sound if boost is enabled
-        if (isBoostEnabled)
-        {
-            AudioSource audioSource = GetComponent<AudioSource>();
-            audioSource.clip = boostSound.clip;
-            audioSource.pitch = Random.Range(boostSound.pitchRange.x, boostSound.pitchRange.y);
-            audioSource.Play();
-        }
-    }
-    public class BoostSound
-    {
-        public AudioClip clip;
-        public Vector2 pitchRange;
     }
 
     private void ProcessFootsteps()
@@ -721,48 +672,30 @@ public class PlayerController : MonoBehaviour
         }
         return footstepSFXs[0];
     }
+
     private void HandleBobbing()
     {
-        float bobbingSpeed = 0f;
-        float currentBobbingAmount = 0f; // New variable for the current bobbing amount
-
-        if (currentState == PlayerState.Idle || controller.velocity.magnitude > 0.1f)
+        if (currentState == PlayerState.Idle || controller.velocity.sqrMagnitude > 0.01f)
         {
-            switch (currentState)
+            (float bobbingSpeed, float currentBobbingAmount) = currentState switch
             {
-                case PlayerState.Idle:
-                    bobbingSpeed = idleBobbingSpeed;
-                    currentBobbingAmount = idleBobbingAmount;
-                    break;
-                case PlayerState.Walking:
-                    bobbingSpeed = walkBobbingSpeed;
-                    currentBobbingAmount = walkBobbingAmount;
-                    break;
-                case PlayerState.Running:
-                    bobbingSpeed = runBobbingSpeed;
-                    currentBobbingAmount = runBobbingAmount;
-                    break;
-                case PlayerState.Boosting:
-                    bobbingSpeed = boostBobbingSpeed;
-                    currentBobbingAmount = boostBobbingAmount;
-                    break;
-            }
+                PlayerState.Idle => (idleBobbingSpeed, idleBobbingAmount),
+                PlayerState.Walking => (walkBobbingSpeed, walkBobbingAmount),
+                PlayerState.Running => (runBobbingSpeed, runBobbingAmount),
+                PlayerState.Boosting => (boostBobbingSpeed, boostBobbingAmount),
+                _ => (0, 0),
+            };
 
             bobbingCounter += Time.deltaTime * bobbingSpeed;
-            playerCamera.transform.localPosition = new Vector3(
-                playerCamera.transform.localPosition.x,
-                defaultCameraYPos + Mathf.Sin(bobbingCounter) * currentBobbingAmount, // Use current bobbing amount here
-                playerCamera.transform.localPosition.z
-            );
+            playerCamera.transform.localPosition = new Vector3(playerCamera.transform.localPosition.x,
+                defaultCameraYPos + Mathf.Sin(bobbingCounter) * currentBobbingAmount,
+                playerCamera.transform.localPosition.z);
         }
         else
         {
-            // Stop bobbing when not moving
-            playerCamera.transform.localPosition = new Vector3(
-                playerCamera.transform.localPosition.x,
-                Mathf.Lerp(playerCamera.transform.localPosition.y, defaultCameraYPos, Time.deltaTime * bobbingSpeed),
-                playerCamera.transform.localPosition.z
-            );
+            playerCamera.transform.localPosition = new Vector3(playerCamera.transform.localPosition.x,
+                Mathf.Lerp(playerCamera.transform.localPosition.y, defaultCameraYPos, Time.deltaTime * idleBobbingSpeed),
+                playerCamera.transform.localPosition.z);
         }
     }
 }
