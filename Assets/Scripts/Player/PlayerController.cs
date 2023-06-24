@@ -579,6 +579,7 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(Vector3.up * mouseLookX);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
+
     private void ProcessLand()
     {
         if (!wasGrounded && isGrounded)
@@ -586,8 +587,20 @@ public class PlayerController : MonoBehaviour
             SurfaceFootstepSFX sfx = GetFootstepSFXForCurrentSurface();
             footstepSource.pitch = Random.Range(sfx.landPitchRange.x, sfx.landPitchRange.y);
             footstepSource.PlayOneShot(sfx.landSounds[Random.Range(0, sfx.landSounds.Length)]);
+
+            // Reset footstep interval when landing
+            ResetFootstepCounter();
         }
     }
+
+    private void ResetFootstepCounter()
+    {
+        // if the player is running, set the footstep counter to the run interval
+        // otherwise, set it to the walk interval
+        footstepCounter = (currentState == PlayerState.Running) ? runFootstepInterval : walkFootstepInterval;
+    }
+
+
     private IEnumerator Boost(KeyCode key)
     {
         if (!boostEnabled)
