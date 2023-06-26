@@ -9,8 +9,10 @@ public class AutoDoor : MonoBehaviour
     public List<GameObject> rightDoors;
     public float doorSpeed = 2f;
     public AudioSource audioSource;
-    public AudioClip openSFX;
-    public AudioClip closeSFX;
+    public AudioClip[] openSFX;
+    public AudioClip[] closeSFX;
+    public Vector2 openPitchRange = new Vector2(0.95f, 1.05f);
+    public Vector2 closePitchRange = new Vector2(0.95f, 1.05f);
     private bool doorsOpen = false;
     private bool insideTrigger = false;
 
@@ -29,7 +31,7 @@ public class AutoDoor : MonoBehaviour
     private void OpenDoors()
     {
         doorsOpen = true;
-        audioSource.PlayOneShot(openSFX);
+        PlaySound(openSFX, openPitchRange);
         foreach (var door in leftDoors)
         {
             StartCoroutine(RotateDoor(door, -90f));  // rotate left doors anti-clockwise
@@ -43,7 +45,7 @@ public class AutoDoor : MonoBehaviour
     private void CloseDoors()
     {
         doorsOpen = false;
-        audioSource.PlayOneShot(closeSFX);
+        PlaySound(closeSFX, closePitchRange);
         foreach (var door in leftDoors)
         {
             StartCoroutine(RotateDoor(door, 90f));  // rotate left doors clockwise
@@ -79,5 +81,11 @@ public class AutoDoor : MonoBehaviour
         {
             insideTrigger = false;
         }
+    }
+
+    private void PlaySound(AudioClip[] sounds, Vector2 pitchRange)
+    {
+        audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        audioSource.PlayOneShot(sounds[Random.Range(0, sounds.Length)]);
     }
 }
