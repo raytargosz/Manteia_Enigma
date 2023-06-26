@@ -14,7 +14,10 @@ public class Room : MonoBehaviour
     {
         foreach (var obj in roomObjects)
         {
-            obj.SetActive(active);
+            if (obj.GetComponent<Collider>() == null || obj.tag != "RoomCollider")
+            {
+                obj.SetActive(active);
+            }
         }
     }
 
@@ -23,3 +26,4 @@ public class Room : MonoBehaviour
         return roomArea.bounds.Contains(playerPosition);
     }
 }
+

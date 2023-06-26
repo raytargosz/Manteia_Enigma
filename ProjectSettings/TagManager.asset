@@ -13,6 +13,7 @@ TagManager:
   - Ladder
   - Ground_Metal
   - Fireball
+  - RoomCollider
   layers:
   - Default
   - TransparentFX

@@ -9,8 +9,6 @@ public class RoomManager : MonoBehaviour
     [Tooltip("Add your rooms here.")]
     public List<Room> rooms = new List<Room>();
 
-    private Room currentRoom;
-
     private void Start()
     {
         // Disable all rooms at start.
@@ -22,8 +20,7 @@ public class RoomManager : MonoBehaviour
         // Enable the first room.
         if (rooms.Count > 0)
         {
-            currentRoom = rooms[0];
-            currentRoom.SetActive(true);
+            rooms[0].SetActive(true);
         }
     }
 
@@ -34,15 +31,13 @@ public class RoomManager : MonoBehaviour
         {
             if (room.IsPlayerInside(player.transform.position))
             {
-                // If the player has entered a new room, disable the current room and enable the new one.
-                if (currentRoom != room)
-                {
-                    currentRoom.SetActive(false);
-                    room.SetActive(true);
-                    currentRoom = room;
-                }
-
-                break;
+                // Enable room if player is inside.
+                room.SetActive(true);
+            }
+            else
+            {
+                // Disable room if player is not inside.
+                room.SetActive(false);
             }
         }
     }
