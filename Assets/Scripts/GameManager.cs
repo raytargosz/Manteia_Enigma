@@ -9,16 +9,21 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public bool isGameOver = false;
     public AudioClip restartSFX;
+    public AudioClip deathMusic;  // new audio clip for death music
     public GameObject player;
     public PlayerController playerController;
     public GameObject gameOverPanel;
     public Image panelImage;
+    public Image restartPanelImage;
     public TextMeshProUGUI gameOverText;
     public TextMeshProUGUI deathByText;
     public Button restartButton;
     public AudioSource audioSource;
+    public AudioSource[] audioSourcesToKeep;  // new array for keeping some audio sources active
+    public GameObject[] gameObjectsToDisable;
     public AudioClip deathSFX;
     public Camera mainCamera;
+    public float restartDelay = 0.5f;  // new delay before restarting the game
     private string killerObjectTag;
     private bool deathTriggered = false;
 
@@ -52,6 +57,9 @@ public class GameManager : MonoBehaviour
 
     public void GameOver(string killerTag)
     {
+        if (deathTriggered) return;  // If death has already been triggered, return immediately
+        deathTriggered = true;
+
         playerController.enabled = false;
         killerObjectTag = killerTag;
 
@@ -59,10 +67,13 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
         player.GetComponent<Collider>().enabled = false;
 
-        StartCoroutine(ShowGameOver());
+        // Disable the game objects
+        foreach (var go in gameObjectsToDisable)
+        {
+            go.SetActive(false);
+        }
 
-        if (deathTriggered) return;
-        deathTriggered = true;
+        StartCoroutine(ShowGameOver());
     }
 
     private IEnumerator ShowGameOver()
@@ -73,6 +84,19 @@ public class GameManager : MonoBehaviour
         if (!audioSource.isPlaying)
         {
             audioSource.PlayOneShot(deathSFX);
+        }
+
+        audioSource.clip = deathMusic;
+        audioSource.loop = true;
+        audioSource.Play();
+
+        // Mute all audio sources except for the ones to keep
+        foreach (var audioSource in FindObjectsOfType<AudioSource>())
+        {
+            if (!System.Array.Exists(audioSourcesToKeep, element => element == audioSource))
+            {
+                audioSource.mute = true;
+            }
         }
 
         StartCoroutine(CameraFall());
@@ -142,20 +166,44 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator RestartGameCoroutine()
     {
+        // Unsubscribe the RestartGame from the restart button's click event
+        restartButton.onClick.RemoveListener(RestartGame);
+
         audioSource.PlayOneShot(restartSFX);
 
-        // Start fading in the image
-        StartCoroutine(FadeIn(panelImage, 1, 0.5f));
+        // Start fading in the restart panel
+        StartCoroutine(FadeIn(restartPanelImage, 1, restartDelay));
 
-        // Wait for 0.5 seconds
-        yield return new WaitForSecondsRealtime(0.5f);
+        // Wait for the delay before restarting the game
+        yield return new WaitForSecondsRealtime(restartDelay);
+
+        // Fade out death music
+        StartCoroutine(FadeOutAudio(audioSource, restartDelay));
 
         // Reset variables
         isGameOver = false;
         player.GetComponent<Collider>().enabled = true;
         deathTriggered = false;
 
+        // Wait for the audio fade out before reloading the scene
+        yield return new WaitForSecondsRealtime(restartDelay);
+
         // Reload scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private IEnumerator FadeOutAudio(AudioSource audioSource, float fadeTime)
+    {
+        float startVolume = audioSource.volume;
+
+        while (audioSource.volume > 0)
+        {
+            audioSource.volume -= startVolume * Time.deltaTime / fadeTime;
+
+            yield return null;
+        }
+
+        audioSource.Stop();
+        audioSource.volume = startVolume;
     }
 }
