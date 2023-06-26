@@ -2,21 +2,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public GameObject player;  // Reference to the player
-    public PlayerController playerController;  // Reference to the player controller script
+    public GameObject player;
+    public PlayerController playerController;
     public GameObject gameOverPanel;
-    public Image panelImage;  // Reference to the panel image
+    public Image panelImage;
     public TextMeshProUGUI gameOverText;
     public TextMeshProUGUI deathByText;
-    public AudioSource audioSource;  // Reference to the audio source
-    public AudioClip deathSFX;  // Sound effect that plays when player dies
-    public Camera mainCamera;  // Reference to the main camera
-    private FireballSpawner[] spawners;
+    public Button restartButton;
+    public AudioSource audioSource;
+    public AudioClip deathSFX;
+    public Camera mainCamera;
+    private string killerObjectTag;
 
     private void Awake()
     {
@@ -32,111 +34,76 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        spawners = FindObjectsOfType<FireballSpawner>();
         gameOverPanel.SetActive(false);
+        restartButton.gameObject.SetActive(false); // make sure the restart button is hidden at the start
     }
 
-    public void GameOver()
+    public void GameOver(string killerTag)
     {
-        foreach (var spawner in spawners)
-        {
-            spawner.StopSpawning();
-        }
-
-        playerController.enabled = false;  // Disable the player controller
+        playerController.enabled = false;
+        killerObjectTag = killerTag;
         StartCoroutine(ShowGameOver());
     }
 
     private IEnumerator ShowGameOver()
     {
-        // Pause the game
-        Time.timeScale = 0f;
-
-        // Enable the panel image and set its alpha to 0
         gameOverPanel.SetActive(true);
-        Color panelColor = panelImage.color;
-        panelColor.a = 0f;
-        panelImage.color = panelColor;
-
-        // Lerp the alpha of the panel image to 0.75
-        float duration = 2.0f;
-        float elapsed = 0;
-        while (elapsed < duration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            panelColor.a = Mathf.Lerp(0, 0.50f, elapsed / duration);
-            panelImage.color = panelColor;
-            yield return null;
-        }
-
-        // Fade in the game over and death by X text
-        StartCoroutine(FadeInText(gameOverText, duration));
-        StartCoroutine(FadeInText(deathByText, duration));
-
-        // Play the death sound effect
         audioSource.PlayOneShot(deathSFX);
 
-        // Make the camera fall and bounce
-        StartCoroutine(CameraFallAndBounce());
+        StartCoroutine(CameraFall());
+        StartCoroutine(FadeIn(panelImage, 0.5f, 2.0f));
+        StartCoroutine(FadeInText(gameOverText, 2.0f));
+        deathByText.text = "You Died by " + killerObjectTag;
+        StartCoroutine(FadeInText(deathByText, 2.0f));
+
+        yield return new WaitForSecondsRealtime(2f);
+
+        restartButton.gameObject.SetActive(true); // reveal the restart button
+        restartButton.onClick.AddListener(RestartGame);
     }
 
+    private IEnumerator FadeIn(Image image, float targetAlpha, float duration)
+    {
+        Color color = image.color;
+        float startAlpha = color.a;
+
+        for (float t = 0.0f; t < 1.0f; t += Time.unscaledDeltaTime / duration)
+        {
+            color.a = Mathf.Lerp(startAlpha, targetAlpha, t);
+            image.color = color;
+            yield return null;
+        }
+    }
 
     private IEnumerator FadeInText(TextMeshProUGUI text, float duration)
     {
-        Color textColor = text.color;
-        textColor.a = 0f;
-        text.color = textColor;
+        Color color = text.color;
+        float startAlpha = color.a;
 
-        float elapsed = 0;
-        while (elapsed < duration)
+        for (float t = 0.0f; t < 1.0f; t += Time.unscaledDeltaTime / duration)
         {
-            elapsed += Time.unscaledDeltaTime;
-            textColor.a = Mathf.Lerp(0, 1, elapsed / duration);
-            text.color = textColor;
+            color.a = Mathf.Lerp(startAlpha, 1, t);
+            text.color = color;
             yield return null;
         }
     }
 
-    private IEnumerator CameraFallAndBounce()
+    private IEnumerator CameraFall()
     {
-        // Wait for a moment before the camera starts to fall
-        yield return new WaitForSecondsRealtime(0.5f);
+        Vector3 startPosition = mainCamera.transform.position;
+        Vector3 endPosition = new Vector3(startPosition.x, 0f, startPosition.z);
 
-        // Perform the fall and bounce
-        float fallTime = 0.5f; // Duration for each fall
-        float bounceHeight = 1f; // Initial bounce height
-        float originalY = mainCamera.transform.position.y;
+        float duration = 1.0f;
 
-        for (int i = 0; i < 4; i++) // Four bounces
+        for (float t = 0.0f; t < 1.0f; t += Time.unscaledDeltaTime / duration)
         {
-            float startTime = Time.realtimeSinceStartup;
-            while (Time.realtimeSinceStartup - startTime < fallTime)
-            {
-                float newY = Mathf.Lerp(originalY, originalY - bounceHeight, (Time.realtimeSinceStartup - startTime) / fallTime);
-                mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, newY, mainCamera.transform.position.z);
-                yield return null;
-            }
-
-            if (i == 3)
-            {
-                // Disable the camera movement if it has reached the floor
-                mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, originalY - 4 * bounceHeight, mainCamera.transform.position.z);
-                break;
-            }
-
-            startTime = Time.realtimeSinceStartup;
-            while (Time.realtimeSinceStartup - startTime < fallTime)
-            {
-                float newY = Mathf.Lerp(originalY - bounceHeight, originalY, (Time.realtimeSinceStartup - startTime) / fallTime);
-                mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, newY, mainCamera.transform.position.z);
-                yield return null;
-            }
+            mainCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            yield return null;
         }
+    }
 
-        // Pause for a moment at the final camera position
-        yield return new WaitForSecondsRealtime(2f);
-
-        // Resume the game
-        Time.timeScale = 1f;
+    private void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // This restarts the current scene
     }
 }

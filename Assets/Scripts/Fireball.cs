@@ -49,7 +49,7 @@ public class Fireball : MonoBehaviour
         if (collider.gameObject.CompareTag("Player"))
         {
             Debug.Log("Player hit by fireball!");
-            GameManager.Instance.GameOver();
+            GameManager.Instance.GameOver(gameObject.tag);
             PlayRandomSFX(impactAudio, impactSFX);
             Destroy(this.gameObject);
         }
