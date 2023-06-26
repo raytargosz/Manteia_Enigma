@@ -16,6 +16,24 @@ public class AutoDoor : MonoBehaviour
     private bool doorsOpen = false;
     private bool insideTrigger = false;
 
+    private Dictionary<GameObject, Quaternion> closedRotations = new Dictionary<GameObject, Quaternion>();
+    private Dictionary<GameObject, Quaternion> openRotations = new Dictionary<GameObject, Quaternion>();
+
+    void Start()
+    {
+        foreach (var door in leftDoors)
+        {
+            closedRotations[door] = door.transform.rotation;
+            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, -80, 0));  // left doors rotate -100 degrees when opened
+        }
+
+        foreach (var door in rightDoors)
+        {
+            closedRotations[door] = door.transform.rotation;
+            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, 80, 0));  // right doors rotate 100 degrees when opened
+        }
+    }
+
     void Update()
     {
         if (insideTrigger && !doorsOpen)
@@ -34,11 +52,11 @@ public class AutoDoor : MonoBehaviour
         PlaySound(openSFX, openPitchRange);
         foreach (var door in leftDoors)
         {
-            StartCoroutine(RotateDoor(door, -90f));  // rotate left doors anti-clockwise
+            StartCoroutine(RotateDoor(door, openRotations[door]));
         }
         foreach (var door in rightDoors)
         {
-            StartCoroutine(RotateDoor(door, 90f));  // rotate right doors clockwise
+            StartCoroutine(RotateDoor(door, openRotations[door]));
         }
     }
 
@@ -48,23 +66,23 @@ public class AutoDoor : MonoBehaviour
         PlaySound(closeSFX, closePitchRange);
         foreach (var door in leftDoors)
         {
-            StartCoroutine(RotateDoor(door, 90f));  // rotate left doors clockwise
+            StartCoroutine(RotateDoor(door, closedRotations[door]));
         }
         foreach (var door in rightDoors)
         {
-            StartCoroutine(RotateDoor(door, -90f));  // rotate right doors anti-clockwise
+            StartCoroutine(RotateDoor(door, closedRotations[door]));
         }
     }
 
-    IEnumerator RotateDoor(GameObject door, float angle)
+    IEnumerator RotateDoor(GameObject door, Quaternion toRotation)
     {
-        var fromAngle = door.transform.rotation;
-        var toAngle = Quaternion.Euler(door.transform.eulerAngles.x, door.transform.eulerAngles.y + angle, door.transform.eulerAngles.z);
+        var fromRotation = door.transform.rotation;
         for (float t = 0f; t < 1; t += Time.deltaTime * doorSpeed)
         {
-            door.transform.rotation = Quaternion.Slerp(fromAngle, toAngle, t);
+            door.transform.rotation = Quaternion.Slerp(fromRotation, toRotation, t);
             yield return null;
         }
+        door.transform.rotation = toRotation;
     }
 
     private void OnTriggerEnter(Collider other)
