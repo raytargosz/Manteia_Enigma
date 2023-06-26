@@ -10,6 +10,7 @@ public class RoomManager : MonoBehaviour
     public List<Room> rooms = new List<Room>();
 
     private Room currentRoom;
+    private List<Room> roomsPlayerIsInside = new List<Room>();
 
     private void Start()
     {
@@ -29,44 +30,27 @@ public class RoomManager : MonoBehaviour
 
     private void Update()
     {
-        // Find the room the player is currently in.
-        foreach (var room in rooms)
+        // If player is not inside any room, then don't do anything
+        if (roomsPlayerIsInside.Count == 0)
+            return;
+
+        Room lastEnteredRoom = roomsPlayerIsInside[roomsPlayerIsInside.Count - 1];
+        // If the player has entered a new room, disable the current room and enable the new one.
+        if (currentRoom != lastEnteredRoom)
         {
-            if (room.IsPlayerInside(player.transform.position))
-            {
-                // If the player has entered a new room, disable the current room and enable the new one.
-                if (currentRoom != room)
-                {
-                    currentRoom.SetActive(false);
-                    room.SetActive(true);
-                    currentRoom = room;
-                }
-
-                break;
-            }
-        }
-    }
-}
-
-[System.Serializable]
-public class Room
-{
-    [Tooltip("Add the collider representing the room's area.")]
-    public Collider roomArea;
-
-    [Tooltip("Add the room's lights, props and other objects here.")]
-    public List<GameObject> roomObjects = new List<GameObject>();
-
-    public void SetActive(bool active)
-    {
-        foreach (var obj in roomObjects)
-        {
-            obj.SetActive(active);
+            currentRoom.SetActive(false);
+            lastEnteredRoom.SetActive(true);
+            currentRoom = lastEnteredRoom;
         }
     }
 
-    public bool IsPlayerInside(Vector3 playerPosition)
+    public void RegisterRoom(Room room)
     {
-        return roomArea.bounds.Contains(playerPosition);
+        roomsPlayerIsInside.Add(room);
+    }
+
+    public void UnregisterRoom(Room room)
+    {
+        roomsPlayerIsInside.Remove(room);
     }
 }
