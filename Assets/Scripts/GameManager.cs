@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
+    public bool isGameOver = false;
+    public AudioClip restartSFX;
     public GameObject player;
     public PlayerController playerController;
     public GameObject gameOverPanel;
@@ -19,6 +20,7 @@ public class GameManager : MonoBehaviour
     public AudioClip deathSFX;
     public Camera mainCamera;
     private string killerObjectTag;
+    private bool deathTriggered = false;
 
     private void Awake()
     {
@@ -32,6 +34,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Check if game is over and if space bar was pressed
+        if (isGameOver && Input.GetKeyDown(KeyCode.Space))
+        {
+            // Simulate button press
+            RestartGame();
+        }
+    }
+
     private void Start()
     {
         gameOverPanel.SetActive(false);
@@ -42,13 +54,26 @@ public class GameManager : MonoBehaviour
     {
         playerController.enabled = false;
         killerObjectTag = killerTag;
+
+        // Set game over flag to true and disable player collider
+        isGameOver = true;
+        player.GetComponent<Collider>().enabled = false;
+
         StartCoroutine(ShowGameOver());
+
+        if (deathTriggered) return;
+        deathTriggered = true;
     }
 
     private IEnumerator ShowGameOver()
     {
         gameOverPanel.SetActive(true);
-        audioSource.PlayOneShot(deathSFX);
+
+        // Play the death SFX once
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(deathSFX);
+        }
 
         StartCoroutine(CameraFall());
         StartCoroutine(FadeIn(panelImage, 0.5f, 2.0f));
@@ -91,19 +116,46 @@ public class GameManager : MonoBehaviour
     private IEnumerator CameraFall()
     {
         Vector3 startPosition = mainCamera.transform.position;
-        Vector3 endPosition = new Vector3(startPosition.x, 0f, startPosition.z);
+        RaycastHit hit;
 
-        float duration = 1.0f;
-
-        for (float t = 0.0f; t < 1.0f; t += Time.unscaledDeltaTime / duration)
+        if (Physics.Raycast(startPosition, Vector3.down, out hit))
         {
-            mainCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
-            yield return null;
+            // Modify the end position to be 25% above the hit point
+            Vector3 endPosition = hit.point + new Vector3(0, hit.distance * 0.25f, 0);
+            float duration = 1.0f;
+
+            for (float t = 0.0f; t < 1.0f; t += Time.unscaledDeltaTime / duration)
+            {
+                mainCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+                yield return null;
+            }
+
+            mainCamera.transform.position = endPosition;
         }
     }
 
     private void RestartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // This restarts the current scene
+        if (!isGameOver) return;  // If game is not over, return and do nothing
+        StartCoroutine(RestartGameCoroutine());
+    }
+
+    private IEnumerator RestartGameCoroutine()
+    {
+        audioSource.PlayOneShot(restartSFX);
+
+        // Start fading in the image
+        StartCoroutine(FadeIn(panelImage, 1, 0.5f));
+
+        // Wait for 0.5 seconds
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        // Reset variables
+        isGameOver = false;
+        player.GetComponent<Collider>().enabled = true;
+        deathTriggered = false;
+
+        // Reload scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
