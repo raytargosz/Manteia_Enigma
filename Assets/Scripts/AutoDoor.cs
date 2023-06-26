@@ -24,13 +24,13 @@ public class AutoDoor : MonoBehaviour
         foreach (var door in leftDoors)
         {
             closedRotations[door] = door.transform.rotation;
-            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, -80, 0));  // left doors rotate -100 degrees when opened
+            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, -80, 0));  // left doors rotate -X degrees when opened
         }
 
         foreach (var door in rightDoors)
         {
             closedRotations[door] = door.transform.rotation;
-            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, 80, 0));  // right doors rotate 100 degrees when opened
+            openRotations[door] = Quaternion.Euler(door.transform.eulerAngles + new Vector3(0, 80, 0));  // right doors rotate X degrees when opened
         }
     }
 
