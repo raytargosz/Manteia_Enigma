@@ -14,7 +14,7 @@ public class Room : MonoBehaviour
     {
         foreach (var obj in roomObjects)
         {
-            if (obj.GetComponent<Collider>() == null || obj.tag != "RoomCollider")
+            if (obj != null)
             {
                 obj.SetActive(active);
             }
