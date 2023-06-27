@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Stylized Clouds
-  m_Shader: {fileID: 4800000, guid: 66b4afa6f9cf39846859cf48238acf58, type: 3}
+  m_Shader: {fileID: 4800000, guid: 7fa7b0c98bd001842a713f112db994ce, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -102,10 +102,10 @@ Material:
     - _AltoCumulusScale: 0.5
     - _AltocumulusMultiplier: 0
     - _AltocumulusScale: 0.67
-    - _BorderEffect: 1
-    - _BorderHeight: 0.5
+    - _BorderEffect: 0
+    - _BorderHeight: 0
     - _BorderSmoothness: 0.928
-    - _BorderVariation: 0.94
+    - _BorderVariation: 0
     - _BumpScale: 1
     - _ChemtrailsMoveSpeed: 0.5
     - _ChemtrailsMultiplier: 0
@@ -154,10 +154,10 @@ Material:
     - _MoonFlareFalloff: 29.2
     - _Multiplier: 5.85
     - _Multiplier1: 0.7351663
-    - _NimbusHeight: 1
+    - _NimbusHeight: 0
     - _NimbusHeightEffect: 1
     - _NimbusMultiplier: 0
-    - _NimbusVariation: 0.9
+    - _NimbusVariation: 0
     - _NoiseScale: 0.1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -173,7 +173,7 @@ Material:
     - _Spherize: 0.354
     - _Spherize1: 0.7351663
     - _SrcBlend: 1
-    - _SunFlareFalloff: 8.224172
+    - _SunFlareFalloff: 11.407753
     - _SunFlareFalloff1: 0.2
     - _TImeOffset: 0
     - _TextureAmount: 1.36
@@ -215,12 +215,12 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainCloudWindDir: {r: 0.3, g: 0.1, b: 0, a: 0}
     - _MainCloudWindDir1: {r: 0.1, g: 0.2, b: 0, a: 0}
-    - _MoonColor: {r: 0.093436904, g: 0.1442675, b: 0.1578027, a: 1}
+    - _MoonColor: {r: 0.08702603, g: 0.13279451, b: 0.14486736, a: 1}
     - _MoonDirection: {r: 7.628955e-10, g: 0.99996185, b: 0.008726478, a: 0}
     - _SecondLayer: {r: 0.9056604, g: 0.9056604, b: 0.9056604, a: 0}
     - _SecondLayer1: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 0}
     - _ShadowDirection: {r: 0, g: 0, b: 0, a: 0}
-    - _StormDirection: {r: 0.7850081, g: -0, b: 0.61948556, a: 0}
+    - _StormDirection: {r: -0, g: -0, b: -0, a: 0}
     - _SunDirection: {r: 0.021961212, g: 0.9569714, b: 0.28935018, a: 0}
     - _SunDirection1: {r: 0, g: 0, b: 0, a: 0}
     - _TexturePanDirection: {r: 0.1, g: 1, b: 0.1, a: 0}
