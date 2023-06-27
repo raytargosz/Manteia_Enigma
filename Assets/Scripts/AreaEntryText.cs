@@ -16,7 +16,22 @@ public class AreaEntryText : MonoBehaviour
     [Tooltip("Time it takes for the text to fade in/out")]
     public float fadeDuration = 1.5f;
 
+    [Tooltip("Whether to fade in the text when the player enters the area or start at full alpha")]
+    public bool fadeIn = true;
+
     private bool hasEntered = false;
+
+    private void Start()
+    {
+        if (!fadeIn)
+        {
+            areaEntryText.color = new Color(areaEntryText.color.r, areaEntryText.color.g, areaEntryText.color.b, 1f);
+        }
+        else
+        {
+            areaEntryText.color = new Color(areaEntryText.color.r, areaEntryText.color.g, areaEntryText.color.b, 0f);
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -24,7 +39,10 @@ public class AreaEntryText : MonoBehaviour
         if (other.gameObject == player && !hasEntered)
         {
             hasEntered = true;
-            StartCoroutine(FadeTextToFullAlpha(fadeDuration, areaEntryText));
+            if (fadeIn)
+            {
+                StartCoroutine(FadeTextToFullAlpha(fadeDuration, areaEntryText));
+            }
         }
     }
 
@@ -39,7 +57,6 @@ public class AreaEntryText : MonoBehaviour
 
     public IEnumerator FadeTextToFullAlpha(float t, TextMeshProUGUI text)
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, 0);
         while (text.color.a < 1.0f)
         {
             text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a + (Time.deltaTime / t));
@@ -49,7 +66,6 @@ public class AreaEntryText : MonoBehaviour
 
     public IEnumerator FadeTextToZeroAlpha(float t, TextMeshProUGUI text)
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, 1);
         while (text.color.a > 0.0f)
         {
             text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (Time.deltaTime / t));
