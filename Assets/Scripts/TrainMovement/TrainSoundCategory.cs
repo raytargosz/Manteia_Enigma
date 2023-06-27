@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class TrainSoundCategory
+public class TrainSoundCategory : MonoBehaviour
 {
     [Header("Sound Category Settings")]
     [Tooltip("Category name, for clarity")]

@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 public class TrainCameraShake : MonoBehaviour
 {
@@ -21,26 +20,11 @@ public class TrainCameraShake : MonoBehaviour
     [Tooltip("Duration of one full bump cycle.")]
     [SerializeField] private float bumpCycleDuration = 2f;
 
-    [Header("Audio Settings")]
-    [Tooltip("Audio source to play sound effects")]
-    [SerializeField] private AudioSource audioSource;
-
-    [Tooltip("Sound effects to play when object shifts")]
-    [SerializeField] private AudioClip[] shiftSounds;
-
-    [Tooltip("Minimum and maximum pitch when playing sound effects")]
-    [SerializeField] private Vector2 pitchRange = new Vector2(0.8f, 1.2f);
-
-    [Tooltip("Minimum delay between sound effects")]
-    [SerializeField] private float soundDelay = 1f;
-
-    private float lastSoundTime;
     private Vector3 originalPos;
 
     void Start()
     {
         originalPos = transform.localPosition;
-        lastSoundTime = -soundDelay;
     }
 
     void Update()
@@ -59,17 +43,5 @@ public class TrainCameraShake : MonoBehaviour
 
         // Smoothly transition to this position
         transform.localPosition = Vector3.Lerp(transform.localPosition, newPos, smoothFactor);
-
-        PlaySoundEffect();
-    }
-
-    private void PlaySoundEffect()
-    {
-        if (Time.time >= lastSoundTime + soundDelay)
-        {
-            lastSoundTime = Time.time;
-            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-            audioSource.PlayOneShot(shiftSounds[Random.Range(0, shiftSounds.Length)]);
-        }
     }
 }
