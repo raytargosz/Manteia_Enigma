@@ -15,6 +15,16 @@ public class SceneTransition : MonoBehaviour
     private List<AudioSource> audioSources;
     private List<float> initialAudioVolumes;
 
+    void OnEnable()
+    {
+        startButton.onClick.AddListener(StartTransition);
+    }
+
+    void OnDisable()
+    {
+        startButton.onClick.RemoveListener(StartTransition);
+    }
+
     void Start()
     {
         audioSources = new List<AudioSource>(FindObjectsOfType<AudioSource>());
@@ -26,10 +36,11 @@ public class SceneTransition : MonoBehaviour
             initialAudioVolumes.Add(audioSource.volume);
         }
 
-        startButton.onClick.AddListener(StartTransition);
+        // Ensure the Image is fully transparent at start
+        fadeOutImage.color = new Color(fadeOutImage.color.r, fadeOutImage.color.g, fadeOutImage.color.b, 0);
     }
 
-    void StartTransition()
+    public void StartTransition()
     {
         StartCoroutine(FadeOutAndLoadScene());
     }

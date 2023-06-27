@@ -173,7 +173,7 @@ Material:
     - _Spherize: 0.354
     - _Spherize1: 0.7351663
     - _SrcBlend: 1
-    - _SunFlareFalloff: 8.224172
+    - _SunFlareFalloff: 14.9
     - _SunFlareFalloff1: 0.2
     - _TImeOffset: 0
     - _TextureAmount: 1.36
@@ -215,7 +215,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MainCloudWindDir: {r: 0.3, g: 0.1, b: 0, a: 0}
     - _MainCloudWindDir1: {r: 0.1, g: 0.2, b: 0, a: 0}
-    - _MoonColor: {r: 0.093436904, g: 0.1442675, b: 0.1578027, a: 1}
+    - _MoonColor: {r: 0.03529412, g: 0.050980385, b: 0.05490196, a: 1}
     - _MoonDirection: {r: 7.628955e-10, g: 0.99996185, b: 0.008726478, a: 0}
     - _SecondLayer: {r: 0.9056604, g: 0.9056604, b: 0.9056604, a: 0}
     - _SecondLayer1: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 0}

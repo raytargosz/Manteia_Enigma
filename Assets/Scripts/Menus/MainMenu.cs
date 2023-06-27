@@ -10,6 +10,7 @@ public class MainMenu : MonoBehaviour
     public Button optionsButton;
     public Button exitButton;
     public GameObject optionsPanel;
+    public SceneTransition sceneTransition; // Reference to the SceneTransition script
 
     private void Start()
     {
@@ -22,7 +23,7 @@ public class MainMenu : MonoBehaviour
 
     private void StartGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        sceneTransition.StartTransition(); // Trigger the fade out and scene load in the SceneTransition script
     }
 
     private void OpenOptions()
