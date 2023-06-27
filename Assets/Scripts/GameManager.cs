@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CameraFall());
         StartCoroutine(FadeIn(panelImage, 0.5f, 2.0f));
         StartCoroutine(FadeInText(gameOverText, 2.0f));
-        deathByText.text = "You Died by " + killerObjectTag;
+        deathByText.text = "Death by " + killerObjectTag;
         StartCoroutine(FadeInText(deathByText, 2.0f));
 
         yield return new WaitForSecondsRealtime(2f);
