@@ -14,6 +14,13 @@ public class CameraFades : MonoBehaviour
     public GameObject uiElement;
     public float fadeDuration = 1.0f;
 
+    void Start()
+    {
+        // Ensure mainCamera is enabled and secondaryCamera is disabled at the start
+        mainCamera.enabled = true;
+        secondaryCamera.enabled = false;
+    }
+
     public void OnButtonClick()
     {
         StartCoroutine(Transition());

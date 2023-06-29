@@ -1,30 +1,40 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class KeyItem : MonoBehaviour
 {
     [Header("Key Pickup Audio and Visuals")]
-    [Tooltip("The audio source that will play the pickup sound effect")]
     public AudioSource audioSource;
-    [Tooltip("The sound effect that will play when the key is picked up")]
     public AudioClip pickupSFX;
-    [Tooltip("The visual effect that will play when the key is picked up")]
     public ParticleSystem pickupVFX;
+    public float increasedSpinSpeed = 20f; // The spin speed during pickup
 
     [Header("Audio Settings")]
-    [Tooltip("The range of pitches that the sound effect can have when the key is picked up")]
     public Vector2 pitchRange = new Vector2(0.95f, 1.05f);
 
-    // Assume the SFX/VFX lasts for 2 seconds, adjust this to match the length of your effects
+    private BobbingAndSpinning bobbingAndSpinning;
     private float effectDuration = 2.0f;
+    private float originalSpinSpeed;
+
+    private void Start()
+    {
+        bobbingAndSpinning = GetComponent<BobbingAndSpinning>();
+        if (bobbingAndSpinning != null)
+        {
+            originalSpinSpeed = bobbingAndSpinning.spinningSpeed;
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            // Disable collider to prevent further triggers
             GetComponent<Collider>().enabled = false;
+
+            if (bobbingAndSpinning != null)
+            {
+                bobbingAndSpinning.spinningSpeed = increasedSpinSpeed;
+            }
 
             if (audioSource != null && pickupSFX != null)
             {
@@ -37,7 +47,6 @@ public class KeyItem : MonoBehaviour
                 pickupVFX.Play();
             }
 
-            // Wait for the effects to finish before deactivating the object
             StartCoroutine(DeactivateAfterDelay(effectDuration));
         }
     }
@@ -45,6 +54,12 @@ public class KeyItem : MonoBehaviour
     private IEnumerator DeactivateAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+
+        if (bobbingAndSpinning != null)
+        {
+            bobbingAndSpinning.spinningSpeed = originalSpinSpeed;
+        }
+
         gameObject.SetActive(false);
     }
 }
