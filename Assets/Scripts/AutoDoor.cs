@@ -6,8 +6,18 @@ using TMPro;
 public class AutoDoor : MonoBehaviour
 {
     [Header("Door Components")]
-    [Tooltip("The GameObject of the door.")]
-    public GameObject doorObject;
+    [Tooltip("The GameObjects of the doors. 0 - Left door, 1 - Right door.")]
+    public GameObject[] doorObjects;
+    [Tooltip("The speed at which the doors open.")]
+    public float openSpeed = 1.0f;
+    [Tooltip("The angle to rotate the doors when they open.")]
+    public float openAngle = 90.0f;
+
+    [Header("Door SFX Settings")]
+    [Tooltip("The sound effects that play when the door opens.")]
+    public AudioClip[] openingSFX;
+    [Tooltip("The sound effects that play when the door closes.")]
+    public AudioClip[] closingSFX;
 
     [Header("Inventory and Required Items")]
     [Tooltip("The player's inventory.")]
@@ -36,14 +46,27 @@ public class AutoDoor : MonoBehaviour
     // Bool to track if the locked sound effect has already been played during the current trigger stay
     private bool playedLockSFX = false;
 
+    private Quaternion[] originalRotations;
+    private Quaternion[] openRotations;
+
     private void Start()
     {
+        // Store the original rotations of the doors and calculate their open rotations
+        originalRotations = new Quaternion[doorObjects.Length];
+        openRotations = new Quaternion[doorObjects.Length];
+        for (int i = 0; i < doorObjects.Length; i++)
+        {
+            originalRotations[i] = doorObjects[i].transform.rotation;
+            openRotations[i] = Quaternion.Euler(doorObjects[i].transform.eulerAngles + new Vector3(0, (i == 0 ? -1 : 1) * openAngle, 0));
+        }
+
         // By default, we stop AutoPortcullis from running
         if (autoPortcullis != null)
         {
             autoPortcullis.enabled = false;
         }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -58,11 +81,15 @@ public class AutoDoor : MonoBehaviour
             }
             else if (!doorLocked)
             {
-                // Re-enable AutoPortcullis when door is unlocked
+                // Play opening SFX
+                PlayRandomSFX(openingSFX);
+
+                // Re-enable AutoPortcullis and open the doors when door is unlocked
                 if (autoPortcullis != null)
                 {
                     autoPortcullis.enabled = true;
                 }
+                StartCoroutine(OpenDoors());
             }
         }
     }
@@ -74,6 +101,14 @@ public class AutoDoor : MonoBehaviour
             // Reset the flag so that the SFX will play again the next time the player enters
             playedLockSFX = false;
             lockedDoorText.gameObject.SetActive(false); // Hide the text
+        }
+        else if (other.gameObject.CompareTag("Player") && !doorLocked)
+        {
+            // Play closing SFX
+            PlayRandomSFX(closingSFX);
+
+            // Start closing the doors when the player leaves the collider
+            StartCoroutine(CloseDoors());
         }
     }
 
@@ -100,5 +135,55 @@ public class AutoDoor : MonoBehaviour
     {
         audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
         audioSource.PlayOneShot(sounds[Random.Range(0, sounds.Length)]);
+    }
+
+    // Opens the doors over time
+    private IEnumerator OpenDoors()
+    {
+        float t = 0;
+        while (t < 1)
+        {
+            t += Time.deltaTime * openSpeed;
+            for (int i = 0; i < doorObjects.Length; i++)
+            {
+                doorObjects[i].transform.rotation = Quaternion.Lerp(originalRotations[i], openRotations[i], t);
+            }
+            yield return null;
+        }
+
+        // Disable colliders
+        foreach (GameObject door in doorObjects)
+        {
+            Collider doorCollider = door.GetComponent<Collider>();
+            if (doorCollider != null)
+            {
+                doorCollider.enabled = false;
+            }
+        }
+    }
+
+    // Closes the doors over time
+    private IEnumerator CloseDoors()
+    {
+        float t = 0;
+        while (t < 1)
+        {
+            t += Time.deltaTime * openSpeed;
+            for (int i = 0; i < doorObjects.Length; i++)
+            {
+                doorObjects[i].transform.rotation = Quaternion.Lerp(openRotations[i], originalRotations[i], t);
+            }
+            yield return null;
+        }
+
+        // Re-enable colliders
+        foreach (GameObject door in doorObjects)
+        {
+            Collider doorCollider = door.GetComponent<Collider>();
+            if (doorCollider != null)
+            {
+                doorCollider.enabled = true;
+            }
+        }
     }
 }
