@@ -1,20 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class AutoDoor : MonoBehaviour
 {
     public GameObject player;
     public List<GameObject> leftDoors;
     public List<GameObject> rightDoors;
+    public List<GameObject> keyItems;
     public float doorSpeed = 2f;
     public AudioSource audioSource;
     public AudioClip[] openSFX;
     public AudioClip[] closeSFX;
     public Vector2 openPitchRange = new Vector2(0.95f, 1.05f);
     public Vector2 closePitchRange = new Vector2(0.95f, 1.05f);
+    public TMP_Text lockMessage;
     private bool doorsOpen = false;
     private bool insideTrigger = false;
+    private int keysCollected = 0;
 
     private Dictionary<GameObject, Quaternion> closedRotations = new Dictionary<GameObject, Quaternion>();
     private Dictionary<GameObject, Quaternion> openRotations = new Dictionary<GameObject, Quaternion>();
@@ -36,13 +40,19 @@ public class AutoDoor : MonoBehaviour
 
     void Update()
     {
-        if (insideTrigger && !doorsOpen)
+        if (insideTrigger && !doorsOpen && keysCollected == keyItems.Count)
         {
             OpenDoors();
+            lockMessage.gameObject.SetActive(false);
         }
         else if (!insideTrigger && doorsOpen)
         {
             CloseDoors();
+        }
+        else if (insideTrigger && !doorsOpen)
+        {
+            lockMessage.text = "The door is locked. Keys collected: " + keysCollected + "/" + keyItems.Count;
+            lockMessage.gameObject.SetActive(true);
         }
     }
 
@@ -91,6 +101,12 @@ public class AutoDoor : MonoBehaviour
         {
             insideTrigger = true;
         }
+
+        if (keyItems.Contains(other.gameObject))
+        {
+            keysCollected++;
+            Destroy(other.gameObject);
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -98,6 +114,7 @@ public class AutoDoor : MonoBehaviour
         if (other.gameObject == player)
         {
             insideTrigger = false;
+            lockMessage.gameObject.SetActive(false);
         }
     }
 
