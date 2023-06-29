@@ -1,4 +1,7 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class AutoDoor : MonoBehaviour
 {
@@ -24,6 +27,10 @@ public class AutoDoor : MonoBehaviour
     [Tooltip("Reference to the AutoPortcullis script that controls the portcullis for this door.")]
     public AutoPortcullis autoPortcullis;
 
+    [Header("UI Components")]
+    [Tooltip("UI text that will display 'Door is locked' message.")]
+    public TMP_Text lockedDoorText;
+
     // Bool to track if the door is locked
     private bool doorLocked = true;
     // Bool to track if the locked sound effect has already been played during the current trigger stay
@@ -37,7 +44,6 @@ public class AutoDoor : MonoBehaviour
             autoPortcullis.enabled = false;
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -47,6 +53,7 @@ public class AutoDoor : MonoBehaviour
             if (doorLocked && !playedLockSFX)
             {
                 PlayRandomSFX(lockedSFX);
+                lockedDoorText.gameObject.SetActive(true); // Show the text
                 playedLockSFX = true;
             }
             else if (!doorLocked)
@@ -66,6 +73,7 @@ public class AutoDoor : MonoBehaviour
         {
             // Reset the flag so that the SFX will play again the next time the player enters
             playedLockSFX = false;
+            lockedDoorText.gameObject.SetActive(false); // Hide the text
         }
     }
 
