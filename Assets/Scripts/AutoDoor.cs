@@ -13,8 +13,10 @@ public class AutoDoor : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip[] openSFX;
     public AudioClip[] closeSFX;
+    public AudioClip[] lockedSFX;  // Array of sound effects for when the door is locked
     public Vector2 openPitchRange = new Vector2(0.95f, 1.05f);
     public Vector2 closePitchRange = new Vector2(0.95f, 1.05f);
+    public Vector2 lockedPitchRange = new Vector2(0.95f, 1.05f);  // Pitch range for the 'locked' sound effects
     public TMP_Text lockMessage;
     private bool doorsOpen = false;
     private bool insideTrigger = false;
@@ -53,6 +55,7 @@ public class AutoDoor : MonoBehaviour
         {
             lockMessage.text = "The door is locked. Keys collected: " + keysCollected + "/" + keyItems.Count;
             lockMessage.gameObject.SetActive(true);
+            PlaySound(lockedSFX, lockedPitchRange);  // play a random 'locked' sound effect with a random pitch
         }
     }
 

@@ -16,32 +16,35 @@ public class KeyItem : MonoBehaviour
     [Tooltip("The range of pitches that the sound effect can have when the key is picked up")]
     public Vector2 pitchRange = new Vector2(0.95f, 1.05f);
 
-    /// <summary>
-    /// Method called when another collider enters this object's trigger area.
-    /// If the other object is tagged as "Player", it will play the pickup sound effect,
-    /// play the pickup visual effect (if it exists), and deactivate this object.
-    /// </summary>
-    /// <param name="other">The other collider that entered this object's trigger area</param>
+    // Assume the SFX/VFX lasts for 2 seconds, adjust this to match the length of your effects
+    private float effectDuration = 2.0f;
+
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the other object is the player
-        if (other.gameObject.CompareTag("Player")) // assuming the player object has a tag of "Player"
+        if (other.gameObject.CompareTag("Player"))
         {
-            // Play sound effect
+            // Disable collider to prevent further triggers
+            GetComponent<Collider>().enabled = false;
+
             if (audioSource != null && pickupSFX != null)
             {
                 audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
                 audioSource.PlayOneShot(pickupSFX);
             }
 
-            // Play visual effect
             if (pickupVFX != null)
             {
                 pickupVFX.Play();
             }
 
-            // Disable the object
-            gameObject.SetActive(false);
+            // Wait for the effects to finish before deactivating the object
+            StartCoroutine(DeactivateAfterDelay(effectDuration));
         }
+    }
+
+    private IEnumerator DeactivateAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameObject.SetActive(false);
     }
 }
