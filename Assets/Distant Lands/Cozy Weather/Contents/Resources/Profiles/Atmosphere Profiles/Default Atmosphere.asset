@@ -310,7 +310,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   sunlightColor:
     mode: 0
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -2642,7 +2642,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cloudSunHighlightFalloff:
     mode: 0
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -2755,7 +2755,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cloudMoonHighlightFalloff:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -2814,7 +2814,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cloudWindSpeed:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3050,7 +3050,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cloudDetailAmount:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3109,7 +3109,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   acScale:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3168,7 +3168,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cirroMoveSpeed:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3227,7 +3227,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cirrusMoveSpeed:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3286,7 +3286,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   chemtrailsMoveSpeed:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3345,7 +3345,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   cloudTexture: {fileID: 2800000, guid: 27248a215d4e5fe449733cb0631f0785, type: 3}
   cloudTextureColor:
     mode: 1
@@ -3464,7 +3464,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 1
+    systemContainsProp: 0
   spherize:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3523,7 +3523,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 1
+    systemContainsProp: 0
   shadowDistance:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}
@@ -3641,7 +3641,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    systemContainsProp: 0
+    systemContainsProp: 1
   textureAmount:
     mode: 1
     colorVal: {r: 1, g: 1, b: 1, a: 1}

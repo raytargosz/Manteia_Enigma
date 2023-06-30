@@ -42,11 +42,11 @@ MonoBehaviour:
   currentDay: 179
   currentYear: 0
   dayAndTime: 179.509
-  pauseTime: 0
+  pauseTime: 1
   realisticYear: 1
   useLeapYear: 1
   resetTicksOnStart: 1
-  startTicks: 0
+  startTicks: 550
   ticksPerDay: 2400
   tickSpeed: 1
   tickSpeedMultiplier:
